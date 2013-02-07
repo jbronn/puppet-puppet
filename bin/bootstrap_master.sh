@@ -2,16 +2,15 @@
 #
 # This script must be run with root privileges; you will need this module
 # (`counsy-puppet`) in addition to counsyl-sys, counsyl-ruby, and counsyl-apache
-# in order to successfully run this script.  These additional modules
-# must be in the parent directory of this module.
-MODULEPATH="../.."
+# in order to successfully run this script.  This script assumes these modules
+# are in the same path as this one.
+MODULEPATH="$( cd "$( dirname "$0" )/../.." && pwd )"
 TMPDIR="/tmp/puppet"
 VARDIR="/var/lib/puppet"
 
-# Create Puppet system group and user, and then apply the `puppet::master`
-# manifests -- which creates the Puppet master, using temporary directories
-# to hold the cruft that Puppet creates on first boot preventing it from
-# clashing with our Puppet master's own configuration files/directories.
+# Apply the `puppet::master` module, which creates the Puppet master
+# using temporary directories to hold the cruft that Puppet creates on
+# first run.
 mkdir -p $TMPDIR && \
 puppet apply --verbose -e "include puppet::master" \
     --modulepath=$MODULEPATH \
