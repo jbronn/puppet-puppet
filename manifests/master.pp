@@ -52,21 +52,22 @@
 #  `sys::inifile` resource for puppet.conf.
 #
 class puppet::master(
-  $certname      = $puppet::params::certname,
-  $user          = $puppet::params::user,
-  $uid           = $puppet::params::uid,
-  $group         = $puppet::params::group,
-  $gid           = $puppet::params::gid,
-  $confdir       = $puppet::params::confdir,
-  $hiera_config  = $puppet::params::hiera_config,
-  $hiera_datadir = $puppet::params::hiera_datadir,
-  $manifestdir   = $puppet::params::manifestdir,
-  $modulepath    = $puppet::params::modulepath,
-  $ssldir        = $puppet::params::ssldir,
-  $vardir        = $puppet::params::vardir,
-  $logdir        = $puppet::params::logdir,
-  $pluginsync    = $puppet::params::pluginsync,
-  $config        = undef,
+  $certname          = $puppet::params::certname,
+  $user              = $puppet::params::user,
+  $uid               = $puppet::params::uid,
+  $group             = $puppet::params::group,
+  $gid               = $puppet::params::gid,
+  $confdir           = $puppet::params::confdir,
+  $hiera_config      = $puppet::params::hiera_config,
+  $hiera_datadir     = $puppet::params::hiera_datadir,
+  $manifestdir       = $puppet::params::manifestdir,
+  $modulepath        = $puppet::params::modulepath,
+  $module_repository = $puppet::params::module_repository,
+  $ssldir            = $puppet::params::ssldir,
+  $vardir            = $puppet::params::vardir,
+  $logdir            = $puppet::params::logdir,
+  $pluginsync        = $puppet::params::pluginsync,
+  $config            = undef,
 ) inherits puppet::params {
 
   # Required modules.

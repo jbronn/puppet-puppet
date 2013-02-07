@@ -22,6 +22,7 @@ class puppet::params {
   $server = "puppet.${::domain}"
   $ssldir = "${confdir}/ssl"
   $vardir = '/var/lib/puppet'
+  $module_repository = 'https://forge.puppetlabs.com'
 
   case $::osfamily {
     openbsd: {
