@@ -1,0 +1,36 @@
+Listen 8140
+<VirtualHost *:8140>
+  ServerName <%= scope.lookupvar('puppet::master::certname') %>
+
+  SSLEngine on
+  SSLProtocol -ALL +SSLv3 +TLSv1
+  SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP
+
+  SSLCertificateFile <%= scope.lookupvar('puppet::master::ssldir') %>/certs/<%= scope.lookupvar('puppet::master::certname') %>.pem
+  SSLCertificateKeyFile <%= scope.lookupvar('puppet::master::ssldir') %>/private_keys/<%= scope.lookupvar('puppet::master::certname') %>.pem
+  SSLCertificateChainFile <%= scope.lookupvar('puppet::master::ssldir') %>/certs/ca.pem
+  SSLCACertificateFile <%= scope.lookupvar('puppet::master::ssldir') %>/ca/ca_crt.pem
+
+  SSLCARevocationFile <%= scope.lookupvar('puppet::master::ssldir') %>/ca/ca_crl.pem
+
+  SSLVerifyClient optional
+  SSLVerifyDepth 1
+  SSLOptions +StdEnvVars
+
+  RequestHeader set X-SSL-Subject %{SSL_CLIENT_S_DN}e
+  RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
+  RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
+  
+  RackAutoDetect On
+  DocumentRoot <%= scope.lookupvar('puppet::master::confdir') %>/rack/puppetmaster/public/
+  <Directory <%= scope.lookupvar('puppet::master::confdir') %>/rack/puppetmaster/>
+    Options None
+    AllowOverride None
+    Order allow,deny
+    allow from all
+  </Directory>
+
+  LogLevel warn
+  ErrorLog <%= scope.lookupvar('puppet::master::logdir') %>/master_error.log
+  CustomLog <%= scope.lookupvar('puppet::master::logdir') %>/master_access.log combined
+</VirtualHost>

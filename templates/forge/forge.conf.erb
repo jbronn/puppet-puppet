@@ -1,0 +1,35 @@
+<VirtualHost _default_:80>
+  ServerAlias *
+
+  # Allow Apache to access the directory with the WSGI file.
+  <Directory "<%= @forge %>/apache">
+    Options -Indexes
+    Order deny,allow
+    Allow from all
+  </Directory>
+
+  # Telling Apache about the WSGI file.
+  WSGIDaemonProcess forge processes=2
+  WSGIProcessGroup forge
+  WSGIScriptAlias / <%= @forge %>/apache/django.wsgi
+
+  # Django media.
+  Alias /system/releases/ "<%= @forge_releases %>/"
+  <Directory "<%= @forge_releases %>">
+    Options -Indexes
+    Order deny,allow
+    Allow from all
+  </Directory>
+
+  Alias /static/ "<%= @forge_static %>/"
+  <Directory "<%= @forge_static %>">
+    Options -Indexes
+    Order deny,allow
+    Allow from all
+  </Directory>
+
+  # Logjammin'
+  LogLevel warn
+  ErrorLog <%= scope.lookupvar('apache::params::logs') %>/forge_error.log
+  CustomLog <%= scope.lookupvar('apache::params::logs') %>/forge_access.log combined
+</VirtualHost>
