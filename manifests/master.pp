@@ -196,6 +196,6 @@ class puppet::master(
     unless      => "test -d ${ssldir}/ca",
     refreshonly => true,
     user        => 'root',
-    subscribe   => Sys::Inifile['puppet.conf'],
+    subscribe   => Sys::Inifile[$config_file],
   }
 }
