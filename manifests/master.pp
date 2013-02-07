@@ -155,18 +155,19 @@ class puppet::master(
   } else {
     $config_hash = {
       'main' => {
-        'certname'     => $certname,
-        'confdir'      => $confdir,
-        'group'        => $group,
-        'hiera_config' => $hiera_config,
-        'logdir'       => $logdir,
-        'manifestdir'  => $manifestdir,
-        'modulepath'   => $modulepath,
-        'pluginsync'   => $pluginsync,
-        'server'       => $certname,
-        'ssldir'       => $ssldir,
-        'user'         => $user,
-        'vardir'       => $vardir,
+        'certname'          => $certname,
+        'confdir'           => $confdir,
+        'group'             => $group,
+        'hiera_config'      => $hiera_config,
+        'logdir'            => $logdir,
+        'manifestdir'       => $manifestdir,
+        'modulepath'        => $modulepath,
+        'module_repository' => $module_repository,
+        'pluginsync'        => $pluginsync,
+        'server'            => $certname,
+        'ssldir'            => $ssldir,
+        'user'              => $user,
+        'vardir'            => $vardir,
       }
     }
   }
