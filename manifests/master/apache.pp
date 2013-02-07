@@ -48,7 +48,7 @@ class puppet::master::apache {
 
   apache::site { 'puppetmaster':
     ensure  => present,
-    require => [Class['apache::passenger::config'],
+    require => [Class['apache::passenger'],
                 Class['puppet::master::rack'],
                 File[$puppetmaster]],
   }
