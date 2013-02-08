@@ -1,10 +1,17 @@
 # == Class: puppet::forge
 #
-# Experimental.
+# Installs a private implementation of the Puppet Forge using django-forge.
 #
 class puppet::forge() {
-  if $::operatingsystem != 'Ubuntu' or $::lsbmajdistrelease < 12 {
-    fail('Only supported on Ubuntu 12.04 and above.')
+  # Install Apache, Python, Django, and mod_wsgi.
+  include apache::params
+  include apache::wsgi
+  include python::django
+
+  package { 'django-forge':
+    ensure   => installed,
+    provider => 'pip',
+    require  => Class['python::django'],
   }
 
   # Variable setup.
@@ -12,77 +19,47 @@ class puppet::forge() {
   $pythonlib = '/usr/local/lib/python2.7/dist-packages'
   $django = "${pythonlib}/django"
   $forge = "${pythonlib}/forge"
-  $db_dir = "${forge}/db"
-  $forge_db = "${db_dir}/forge.db"
-  $forge_www = '/var/www/forge'
-  $forge_releases = "${forge_www}/releases"
-  $forge_static = "${forge_www}/static"
+
+  $forge_root = '/var/forge'
+  $forge_dbroot = "${forge_root}/db"
+  $forge_db = "${forge_dbroot}/forge.db"
+  $forge_releases = "${forge_root}/releases"
+  $forge_static = "${forge_root}/static"
   $forge_site = "${apache::params::sites_available}/forge"
 
-  $tarball = 'django-forge-0.4.0.tar.gz'
-  $tarball_path = "/root/${tarball}"
-
-  # XXX: Until `python` module is ported, can't use apache::wsgi.
-  include apache
-  package { 'python':
-    ensure => installed,
-  }
-
-  package { 'python-pip':
-    ensure  => installed,
-    require => Package['python'],
-  }
-
-  package { 'Django':
-    ensure   => installed,
-    provider => 'pip',
-    require  => Package['python-pip'],
-  }
-
-  package { 'libapache2-mod-wsgi':
-    ensure  => installed,
-    alias   => 'mod_wsgi',
-    require => [Class['apache::install'],
-                Package['python']],
-  }
-
-  # Ensure mod_wsgi is enabled.
-  apache::module { 'wsgi':
-    ensure  => enabled,
-    require => Package['mod_wsgi'],
-  }
-
-  file { $tarball_path:
-    ensure  => file,
+  file { $forge_root:
+    ensure  => directory,
     owner   => 'root',
-    group   => 'root',
-    mode    => '0600',
-    source  => "puppet:///modules/puppet/forge/${tarball}",
+    group   => $apache::params::group,
+    mode    => '0640',
   }
 
-  file { [$forge_www, $forge_releases]:
+  file { $forge_dbroot:
+    ensure  => directory,
+    owner   => $apache::params::user,
+    group   => $apache::params::group,
+    mode    => '0600',
+  }
+
+  file { $forge_releases:
     ensure  => directory,
     owner   => $apache::params::user,
     group   => $apache::params::group,
     mode    => '0640',
-    require => Class['apache::install'],
-  }
-
-  exec { 'install-django-forge':
-    command     => "pip install -I ${tarball}",
-    path        => $path,
-    cwd         => '/root',
-    user        => 'root',
-    subscribe   => File[$tarball_path],
-    refreshonly => true,
-    require     => [ File[$tarball_path], Package['Django'] ],
   }
 
   $releases_link = "${forge}/releases"
   file { $releases_link:
     ensure  => link,
     target  => $forge_releases,
-    require => Exec['install-django-forge'],
+    require => Package['django-forge'],
+  }
+
+  $db_link = "${forge}/db"
+  file { $db_link:
+    ensure  => link,
+    target  => $forge_dbroot,
+    require => Package['django-forge'],
   }
 
   file { $forge_static:
@@ -91,28 +68,19 @@ class puppet::forge() {
     require => Package['Django'],
   }
 
-  file { $db_dir:
-    ensure  => directory,
-    owner   => $apache::params::user,
-    group   => $apache::params::user,
-    mode    => '0600',
-    require => Exec['install-django-forge'],
-  }
-
   exec { 'create-forge-database':
     command => 'django-admin.py syncdb --settings=forge.settings --noinput',
     path    => $path,
     user    => 'root',
     creates => $forge_db,
-    require => [ File[$releases_link], File[$db_dir] ],
+    require => [File[$releases_link], File[$db_link]],
   }
 
   file { $forge_db:
     ensure  => file,
     owner   => $apache::params::user,
-    group   => $apache::params::user,
+    group   => $apache::params::group,
     mode    => '0600',
-    notify  => Service['apache'],
     require => Exec['create-forge-database'],
   }
 
@@ -123,7 +91,7 @@ class puppet::forge() {
     mode    => '0644',
     content => template('puppet/forge/forge.conf.erb'),
     notify  => Service['apache'],
-    require => [ Class['apache::install'], File[$forge_db] ],
+    require => [Class['apache::install'], Exec['create-forge-database']],
   }
 
   apache::site { 'default':
