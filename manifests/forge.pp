@@ -6,6 +6,7 @@ class puppet::forge() {
   # Install Apache, Python, Django, and mod_wsgi.
   include apache::params
   include apache::wsgi
+  include python::params
   include python::django
 
   package { 'django-forge':
@@ -16,9 +17,8 @@ class puppet::forge() {
 
   # Variable setup.
   $path = ['/usr/local/bin', '/usr/bin']
-  $pythonlib = '/usr/local/lib/python2.7/dist-packages'
-  $django = "${pythonlib}/django"
-  $forge = "${pythonlib}/forge"
+  $django = "${python::params::site_packages}/django"
+  $forge = "${python::params::site_packages}/forge"
 
   $forge_root = '/var/forge'
   $forge_dbroot = "${forge_root}/db"

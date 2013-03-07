@@ -9,7 +9,7 @@ class puppet(
   $version        = $puppet::params::version,
   $facter_version = $puppet::params::facter_version,
 ) inherits puppet::params {
-  require ruby
+  include ruby
 
   if $gem {
     # Install Puppet and Facter via gem.
@@ -35,9 +35,9 @@ class puppet(
   } elsif $package {
     # Install Puppet via OS package.
     package { $package:
-      ensure   => installed,
-      alias    => 'puppet',
-      require  => Class['ruby'],
+      ensure  => installed,
+      alias   => 'puppet',
+      require => Class['ruby'],
     }
   } else {
     fail("Unable to install Puppet on ${::operatingsystem}.\n")
