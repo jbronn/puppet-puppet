@@ -8,26 +8,40 @@ class puppet(
   $package        = $puppet::params::package,
   $version        = $puppet::params::version,
   $facter_version = $puppet::params::facter_version,
+  $hiera_version  = $puppet::params::hiera_version,
+  $json_version   = $puppet::params::json_version,
 ) inherits puppet::params {
   include ruby
 
   if $gem {
-    # Install Puppet and Facter via gem.
+    # Install Puppet and prerequisites via gem.
     package { 'facter':
       ensure   => $facter_version,
       provider => 'gem',
       require  => Class['ruby'],
     }
 
+    package { 'json_pure':
+      ensure   => $json_version,
+      provider => 'gem',
+      require  => Class['ruby'],
+    }
+
+    package { 'hiera':
+      ensure   => $hiera_version,
+      provider => 'gem',
+      require  => Package['json_pure'],
+    }
+
     package { 'puppet':
       ensure   => $version,
       provider => 'gem',
-      require  => [Class['ruby'], Package['facter']],
+      require  => [Class['ruby'], Package['facter'], Package['hiera']],
     }
 
     # Uninstall old gem versions of Puppet/Facter automatically.
     exec { 'puppet-cleanup':
-      command     => 'gem cleanup puppet facter',
+      command     => 'gem cleanup puppet facter hiera json_pure',
       path        => ['/bin', '/usr/bin'],
       refreshonly => true,
       subscribe   => [Package['puppet'], Package['facter']],

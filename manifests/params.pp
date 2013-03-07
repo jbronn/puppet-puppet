@@ -3,7 +3,9 @@
 # Platform-dependent parameters for Puppet.
 #
 class puppet::params {
-  # User/group settings.
+  # User/group settings.  The specific UIDs chosen are inspired from
+  # OpenBSD, and are in the range of "system" IDs on Ubuntu systems
+  # by default (and should be for Illumos variants as well, but not tested).
   include sys
   $uid = '580'
   $gid = '580'
@@ -14,7 +16,7 @@ class puppet::params {
   $confdir = '/etc/puppet'
   $logdir = '/var/log/puppet'
   $hiera_config = "${confdir}/hiera.yaml"
-  $hiera_datadir = "${confdir}/hiera"
+  $hiera_datadir = "/var/lib/hiera"
   $manifestdir = "${confdir}/manifests"
   $modulepath = "${confdir}/modules"
   $pluginsync = true
@@ -42,9 +44,12 @@ class puppet::params {
       $gem = true
       $user = 'puppet'
       $group = 'puppet'
-      # Peg to versions that we know work.
-      $version = '3.1.0'
-      $facter_version = '1.6.17'
+      # Use latest versions at time of installation -- but user
+      # isn't stopped from changing class parameter.
+      $version = 'installed'
+      $facter_version = 'installed'
+      $hiera_version = 'installed'
+      $json_version = 'installed'
     }
   }
 }

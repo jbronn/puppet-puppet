@@ -70,7 +70,7 @@ class puppet::master(
   $config            = undef,
 ) inherits puppet::params {
 
-  # Required modules.
+  # Puppet itself is required first.
   include puppet
   include puppet::master::apache
   $home = $vardir
@@ -137,12 +137,21 @@ class puppet::master(
   ## Puppet configuration files ##
 
   # Hiera configuration.
-  file { $hiera_config:
-    ensure  => file,
-    mode    => '0600',
-    content => template('puppet/master/hiera.yaml.erb'),
-    notify  => Service['apache'],
-    require => File[$hiera_datadir],
+  puppet::hiera_config { $hiera_config:
+    backends  => ['yaml', 'puppet'],
+    settings  => {
+      'yaml'   => {
+         'datadir' => $hiera_datadir,
+      },
+      'puppet' => {
+        'datasource' => 'data',
+      },
+    },
+    hierarchy => ['"%{::operatingsystem}"', 'common'],
+    owner     => $user,
+    group     => $group,
+    notify    => Service['apache'],
+    require   => File[$hiera_datadir],
   }
 
   # Puppet configuration (puppet.conf).
