@@ -1,0 +1,15 @@
+<%= @header %>
+<% @mounts.keys.each do |mount| -%>
+[<%= mount %>]
+    path <%= @mounts[mount]['path'] %>
+<% if @mounts[mount].has_key? 'allow' -%>
+<% @mounts[mount]['allow'].each do |allow_host| -%>
+    allow <%= allow_host %>
+<% end -%>
+<% end -%>
+<% if @mounts[mount].has_key? 'deny' -%>
+<% @mounts[mount]['deny'].each do |deny_host| -%>
+    deny <%= deny_host %>
+<% end -%>
+<% end -%>
+<% end -%>

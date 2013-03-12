@@ -18,6 +18,7 @@ class puppet::params {
   $hiera_config = "${confdir}/hiera.yaml"
   $hiera_datadir = "/var/lib/hiera"
   $manifestdir = "${confdir}/manifests"
+  $fileserverconfig = "${confdir}/fileserver.conf"
   $modulepath = "${confdir}/modules"
   $pluginsync = true
   $report = true
