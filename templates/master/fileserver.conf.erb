@@ -1,5 +1,5 @@
 <%= @header %>
-<% @mounts.keys.each do |mount| -%>
+<% @mounts.keys.sort.each do |mount| -%>
 [<%= mount %>]
     path <%= @mounts[mount]['path'] %>
 <% if @mounts[mount].has_key? 'allow' -%>
