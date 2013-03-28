@@ -1,7 +1,7 @@
 name    'counsyl-puppet'
 version '1.0.0'
 source 'git://github.counsyl.com/justin/counsyl-puppet.git'
-author 'counsyl'
+author 'Counsyl, Inc.'
 license 'Apache License, Version 2.0'
 summary 'Installs the Puppet Agent, Forge, and Master'
 description 'Installs the Puppet Agent, Forge, and Master'
