@@ -51,6 +51,7 @@ class puppet::params {
       $facter_version = 'installed'
       $hiera_version = 'installed'
       $json_version = 'installed'
+      $rgen_version = 'installed'
     }
   }
 }
