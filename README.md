@@ -17,4 +17,4 @@ Justin Bronn <justin@counsyl.com>
 Support
 -------
 
-Please log tickets and issues at https://github.counsyl.com/justin/counsyl-puppet
+Please log tickets and issues at https://github.counsyl.com/dev/puppet-puppet
