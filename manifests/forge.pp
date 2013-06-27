@@ -2,7 +2,44 @@
 #
 # Installs a private implementation of the Puppet Forge using django-forge.
 #
-class puppet::forge() {
+# === Parameters
+#
+# [*root*]
+#  The root directory (FORGE_ROOT) for django-forge's files.  Defaults to
+#  '/var/forge'.
+#
+# [*ssl_cert*]
+#  The path of the SSL certificate file; requires `ssl_key` parameter.
+#
+# [*ssl_key*]
+#  The path of the SSL private key file; requires `ssl_cert` parameter.
+#
+# [*ssl_chain*]
+#  The path of the SSL certificate chain file.
+#
+# [*processes*]
+#  The number of processes to allocate to mod_wsgi, defaults to 5.
+#
+# [*server_name*]
+#  The `ServerName` configuration value for Apache.
+#
+# [*server_admin*]
+#  The `ServerAdmin` configuration value for Apache.
+#
+# [*template*]
+#  The template to use to generate the Apache site configuration file,
+#  defaults to 'puppet/forge/forge.conf.erb'.
+#
+class puppet::forge(
+  $root         = '/var/forge',
+  $ssl_cert     = undef,
+  $ssl_key      = undef,
+  $ssl_chain    = undef,
+  $processes    = '5',
+  $server_name  = $::fqdn,
+  $server_admin = "admin@${::domain}",
+  $template     = 'puppet/forge/forge.conf.erb'
+) {
   # Install Apache, Python, Django, and mod_wsgi.
   include apache::params
   include apache::wsgi
@@ -19,29 +56,46 @@ class puppet::forge() {
   $path = ['/usr/local/bin', '/usr/bin']
   $django = "${python::params::site_packages}/django"
   $forge = "${python::params::site_packages}/forge"
+  $forge_apache = "${forge}/apache"
+  $forge_wsgi = "${forge_apache}/django.wsgi"
 
-  $forge_root = '/var/forge'
-  $forge_dbroot = "${forge_root}/db"
-  $forge_db = "${forge_dbroot}/forge.db"
-  $forge_releases = "${forge_root}/releases"
-  $forge_static = "${forge_root}/static"
-  $forge_site = "${apache::params::sites_available}/forge"
+  $dbroot = "${root}/db"
+  $db = "${dbroot}/forge.db"
+  $releases = "${root}/releases"
+  $static = "${root}/static"
+  $site = "${apache::params::sites_available}/forge"
 
-  file { $forge_root:
+  # If SSL, we want HSTS.
+  if $ssl_cert and $ssl_key {
+    include apache::hsts
+    Class['apache::hsts'] -> Apache::Site['forge']
+
+    apache::module { 'rewrite':
+      ensure => enabled,
+      before => Apache::Site['forge'],
+    }
+
+    apache::module { 'ssl':
+      ensure => enabled,
+      before => Apache::Site['forge'],
+    }
+  }
+
+  file { $root:
     ensure  => directory,
     owner   => 'root',
     group   => $apache::params::group,
     mode    => '0640',
   }
 
-  file { $forge_dbroot:
+  file { $dbroot:
     ensure  => directory,
     owner   => $apache::params::user,
     group   => $apache::params::group,
     mode    => '0600',
   }
 
-  file { $forge_releases:
+  file { $releases:
     ensure  => directory,
     owner   => $apache::params::user,
     group   => $apache::params::group,
@@ -51,32 +105,32 @@ class puppet::forge() {
   $releases_link = "${forge}/releases"
   file { $releases_link:
     ensure  => link,
-    target  => $forge_releases,
+    target  => $releases,
     require => Package['django-forge'],
   }
 
   $db_link = "${forge}/db"
   file { $db_link:
     ensure  => link,
-    target  => $forge_dbroot,
+    target  => $dbroot,
     require => Package['django-forge'],
   }
 
-  file { $forge_static:
+  file { $static:
     ensure  => link,
     target  => "${django}/contrib/admin/static",
-    require => Package['Django'],
+    require => Class['python::django'],
   }
 
   exec { 'create-forge-database':
     command => 'django-admin.py syncdb --settings=forge.settings --noinput',
     path    => $path,
     user    => 'root',
-    creates => $forge_db,
+    creates => $db,
     require => [File[$releases_link], File[$db_link]],
   }
 
-  file { $forge_db:
+  file { $db:
     ensure  => file,
     owner   => $apache::params::user,
     group   => $apache::params::group,
@@ -84,12 +138,12 @@ class puppet::forge() {
     require => Exec['create-forge-database'],
   }
 
-  file { $forge_site:
+  file { $site:
     ensure  => file,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    content => template('puppet/forge/forge.conf.erb'),
+    content => template($template),
     notify  => Service['apache'],
     require => [Class['apache::install'], Exec['create-forge-database']],
   }
@@ -100,6 +154,6 @@ class puppet::forge() {
 
   apache::site { 'forge':
     ensure  => enabled,
-    require => File[$forge_site],
+    require => File[$site],
   }
 }

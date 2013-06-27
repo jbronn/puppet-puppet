@@ -1,28 +1,48 @@
+<% if @ssl_cert and @ssl_key -%>
 <VirtualHost _default_:80>
   ServerAlias *
+  RewriteEngine On
+  RewriteRule ^(.*)$ https://<%= @server_name %>$1 [redirect=301]
+</VirtualHost>
+
+<VirtualHost _default_:443>
+  # SSL Settings
+  SSLEngine on
+  SSLCertificateFile <%= @ssl_cert %>
+  SSLCertificateKeyFile <%= @ssl_key %>
+<% if @ssl_chain -%>
+  SSLCertificateChainFile <%= @ssl_chain %>
+<% end -%>
+<% else -%>
+<VirtualHost _default_:80>
+<% end -%>
+  ServerName <%= @server_name %>
+  ServerAdmin <%= @server_admin %>
 
   # Allow Apache to access the directory with the WSGI file.
-  <Directory "<%= @forge %>/apache">
+  <Directory <%= @forge_apache %>>
     Options -Indexes
-    Order deny,allow
-    Allow from all
+    <Files <%= File.basename(@forge_wsgi) %>>
+      Order deny,allow
+      Allow from all
+    </Files>
   </Directory>
 
   # Telling Apache about the WSGI file.
-  WSGIDaemonProcess forge processes=2
+  WSGIDaemonProcess forge processes=<%= @processes %>
   WSGIProcessGroup forge
-  WSGIScriptAlias / <%= @forge %>/apache/django.wsgi
+  WSGIScriptAlias / <%= @forge_wsgi %>
 
   # Django media.
-  Alias /system/releases/ "<%= @forge_releases %>/"
-  <Directory "<%= @forge_releases %>">
+  Alias /system/releases/ "<%= @releases %>/"
+  <Directory "<%= @releases %>">
     Options -Indexes
     Order deny,allow
     Allow from all
   </Directory>
 
-  Alias /static/ "<%= @forge_static %>/"
-  <Directory "<%= @forge_static %>">
+  Alias /static/ "<%= @static %>/"
+  <Directory "<%= @static %>">
     Options -Indexes
     Order deny,allow
     Allow from all
