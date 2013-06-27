@@ -20,6 +20,11 @@
 # [*processes*]
 #  The number of processes to allocate to mod_wsgi, defaults to 5.
 #
+# [*hsts*]
+#  Whether or not to enable HTTP Strict Transport Security.  By default
+#  this is disabled (due to bad clients like librarian-puppet that
+#  can't handle it).
+#
 # [*server_name*]
 #  The `ServerName` configuration value for Apache.
 #
@@ -36,9 +41,10 @@ class puppet::forge(
   $ssl_key      = undef,
   $ssl_chain    = undef,
   $processes    = '5',
+  $hsts         = false,
   $server_name  = $::fqdn,
   $server_admin = "admin@${::domain}",
-  $template     = 'puppet/forge/forge.conf.erb'
+  $template     = undef,
 ) {
   # Install Apache, Python, Django, and mod_wsgi.
   include apache::params
@@ -65,19 +71,21 @@ class puppet::forge(
   $static = "${root}/static"
   $site = "${apache::params::sites_available}/forge"
 
-  # If SSL, we want HSTS.
+  # We support SSL and HSTS (optional).
   if $ssl_cert and $ssl_key {
-    include apache::hsts
-    Class['apache::hsts'] -> Apache::Site['forge']
-
-    apache::module { 'rewrite':
+    apache::module { 'ssl':
       ensure => enabled,
       before => Apache::Site['forge'],
     }
 
-    apache::module { 'ssl':
-      ensure => enabled,
-      before => Apache::Site['forge'],
+    if $hsts {
+      include apache::hsts
+      Class['apache::hsts'] -> Apache::Site['forge']
+
+      apache::module { 'rewrite':
+        ensure => enabled,
+        before => Apache::Site['forge'],
+      }
     }
   }
 
@@ -138,12 +146,20 @@ class puppet::forge(
     require => Exec['create-forge-database'],
   }
 
+  if $template {
+    $site_template = $template
+  } elsif $hsts and $ssl_cert and $ssl_chain {
+    $site_template = 'puppet/forge/forge_hsts.conf.erb'
+  } else {
+    $site_template = 'puppet/forge/forge.conf.erb'
+  }
+
   file { $site:
     ensure  => file,
     owner   => 'root',
     group   => 'root',
     mode    => '0644',
-    content => template($template),
+    content => template($site_template),
     notify  => Service['apache'],
     require => [Class['apache::install'], Exec['create-forge-database']],
   }
