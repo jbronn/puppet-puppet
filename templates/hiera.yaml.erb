@@ -17,7 +17,7 @@
 <% end -%>
 <% if @hierarchy.is_a? Array -%>
 :hierarchy:
-<% hierarchy.each do |hierarchy_source| -%>
+<% @hierarchy.each do |hierarchy_source| -%>
   - <%= hierarchy_source %>
 <% end -%>
 <% else -%>
