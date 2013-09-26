@@ -20,8 +20,12 @@ Listen 8140
   RequestHeader set X-SSL-Subject %{SSL_CLIENT_S_DN}e
   RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
   RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
-  
+
+<% if scope.lookupvar('ruby::passenger::version').start_with? '3' -%>
   RackAutoDetect On
+<% else -%>
+  PassengerEnabled On
+<% end -%>
   DocumentRoot <%= scope.lookupvar('puppet::master::confdir') %>/rack/puppetmaster/public/
   <Directory <%= scope.lookupvar('puppet::master::confdir') %>/rack/puppetmaster/>
     Options None
