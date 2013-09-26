@@ -5,47 +5,57 @@
 # === Parameters
 #
 # [*certname*]
-#   The name of the puppet master, defaults to the node's FQDN.
+#  The name of the puppet master, defaults to the node's FQDN.
 #
 # [*user*]
-#   The name of the user to run the Puppet master as.  Defaults to 'puppet'.
+#  The name of the user to run the Puppet master as.  Defaults to 'puppet'.
 #
 # [*uid*]
-#   The uid to use for the Puppet user.  Defaults to '1001'.
+#  The uid to use for the Puppet user.  Defaults to '1001'.
 #
 # [*group*]
-#   The name of the group to run the Puppet master as.  Defaults to 'puppet'.
+#  The name of the group to run the Puppet master as.  Defaults to 'puppet'.
 #
 # [*gid*]
-#   The gid to use for the Puppet group.  Defaults to '1001'.
+#  The gid to use for the Puppet group.  Defaults to '1001'.
 #
 # [*confdir*]
-#   The path of the configuration directory, defaults to '/etc/puppet'.
+#  The path of the configuration directory, defaults to '/etc/puppet'.
 #
 # [*hiera_config*]
-#   The Hiera configuration file path, defaults to '/etc/puppet/hiera.yaml'.
+#  The Hiera configuration file path, defaults to '/etc/puppet/hiera.yaml'.
 #
 # [*hiera_datadir*]
-#   The path to the Hiera data directory, defaults to '/etc/puppet/hieradata'.
+#  The path to the Hiera data directory, defaults to '/etc/puppet/hiera'.
+#
+# [*hiera_backends*]
+#  Array of Hiera backends to use, defaults to ['yaml'].
+#
+# [*hiera_settings*]
+#  The settings hash parameter passed through to the `puppet::hiera_config`
+#  resource, the default just specifies the datadir for the YAML backend.
+#
+# [*hiera_hierarchy*]
+#  The hierarchy used by Hiera, defaults to ["'%{::fqdn}'", 'common'].
 #
 # [*manifestdir*]
-#   Path for manifests.  Defaults to '/etc/puppet/manifests'.
+#  Path for manifests.  Defaults to '/etc/puppet/manifests'.
 #
 # [*modulepath*]
-#   Path for modules.  Defaults to '/etc/puppet/modules'.
+#  Path for modules.  Defaults to '/etc/puppet/modules'.
 #
 # [*ssldir*]
-#   Where Puppet stores it's SSL certificates.  Defaults to '/etc/puppet/ssl'.
+#  Where Puppet stores it's SSL certificates.  Defaults to '/etc/puppet/ssl'.
 #
 # [*vardir*]
-#   One of Puppet's main working directories.  Defaults to '/var/lib/puppet'.
+#  One of Puppet's main working directories.  Defaults to '/var/lib/puppet'.
 #
 # [*logdir*]
-#   Where the master should stor its logs.  Defaults to '/var/log/puppet'.
+#  Where the master should stor its logs.  Defaults to '/var/log/puppet'.
 #
 # [*pluginsync*]
-#   Whether or not to enable `pluginsync` in the configuration file.
-#   Defaults to true.
+#  Whether or not to enable `pluginsync` in the configuration file.
+#  Defaults to true.
 #
 # [*config*]
 #  Advanced option to overide the hash used to create the master
@@ -60,6 +70,9 @@ class puppet::master(
   $confdir           = $puppet::params::confdir,
   $hiera_config      = $puppet::params::hiera_config,
   $hiera_datadir     = $puppet::params::hiera_datadir,
+  $hiera_backends    = $puppet::params::hiera_backends,
+  $hiera_settings    = $puppet::params::hiera_settings,
+  $hiera_hierarchy   = $puppet::params::hiera_hierarchy,
   $manifestdir       = $puppet::params::manifestdir,
   $modulepath        = $puppet::params::modulepath,
   $module_repository = $puppet::params::module_repository,
@@ -138,16 +151,9 @@ class puppet::master(
 
   # Hiera configuration.
   puppet::hiera_config { $hiera_config:
-    backends  => ['yaml', 'puppet'],
-    settings  => {
-      'yaml'   => {
-         'datadir' => $hiera_datadir,
-      },
-      'puppet' => {
-        'datasource' => 'data',
-      },
-    },
-    hierarchy => ['"%{::operatingsystem}"', 'common'],
+    backends  => $hiera_backends,
+    settings  => $hiera_settings,
+    hierarchy => $hiera_hierarchy,
     owner     => $user,
     group     => $group,
     notify    => Service['apache'],

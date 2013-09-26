@@ -15,8 +15,6 @@ class puppet::params {
   $certname = $::fqdn
   $confdir = '/etc/puppet'
   $logdir = '/var/log/puppet'
-  $hiera_config = "${confdir}/hiera.yaml"
-  $hiera_datadir = "/var/lib/hiera"
   $manifestdir = "${confdir}/manifests"
   $fileserverconfig = "${confdir}/fileserver.conf"
   $modulepath = "${confdir}/modules"
@@ -26,6 +24,17 @@ class puppet::params {
   $ssldir = "${confdir}/ssl"
   $vardir = '/var/lib/puppet'
   $module_repository = 'https://forge.puppetlabs.com'
+
+  # Sensible Hiera default settings, mostly specific to the Puppet master.
+  $hiera_config = "${confdir}/hiera.yaml"
+  $hiera_datadir = "${confdir}/hiera"
+  $hiera_backends = ['yaml']
+  $hiera_settings = {
+    'yaml'   => {
+      'datadir' => $hiera_datadir,
+    }
+  }
+  $hiera_hierarchy = ["'%{::fqdn}'", 'common']
 
   case $::osfamily {
     openbsd: {
