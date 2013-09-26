@@ -198,13 +198,12 @@ class puppet::master(
                 File[$hiera_config]],
   }
 
-  # Generate CA and certificates for the Puppet Master
-  # if they don't exist.
+  # Generate CA and certificates for the Puppet Master if they don't exist.
   exec { 'puppet-generate-certs':
     # XXX: `puppet cert` command is deprecated in the future.
     command     => "puppet cert generate ${certname}",
-    path        => ['/usr/sbin', '/usr/bin', '/sbin', '/bin'],
-    unless      => "test -d ${ssldir}/ca",
+    path        => ['/usr/sbin', '/usr/bin', '/sbin', '/bin', '/usr/local/bin'],
+    creates     => "${ssldir}/ca",
     refreshonly => true,
     user        => 'root',
     subscribe   => Sys::Inifile[$config_file],
