@@ -1,5 +1,5 @@
 name    'counsyl-puppet'
-version '0.9.3'
+version '0.9.4'
 source  'git://github.counsyl.com/dev/puppet-puppet.git'
 author  'Counsyl, Inc.'
 license 'Apache License, Version 2.0'
@@ -9,4 +9,4 @@ project_page 'https://github.counsyl.com/dev/puppet-puppet'
 
 dependency 'counsyl/apache', '>= 0.8.2'
 dependency 'counsyl/ruby', '>= 0.9.1'
-dependency 'counsyl/sys', '>= 0.9.2'
+dependency 'counsyl/sys', '>= 0.9.4'
