@@ -138,6 +138,27 @@ class puppet::forge(
     require => [File[$releases_link], File[$db_link]],
   }
 
+  # Ensure settings files are only readable by the apache user.
+  file { "${python::site_packages}/forge/settings.py":
+    ensure  => file,
+    backup  => false,
+    owner   => $apache::params::user,
+    group   => $apache::params::group,
+    mode    => '0600',
+    notify  => Service['apache'],
+    require => Package['django-forge'],
+  }
+
+  file { "${python::site_packages}/forge/settings_secret.py":
+    ensure  => file,
+    backup  => false,
+    owner   => $apache::params::user,
+    group   => $apache::params::group,
+    mode    => '0600',
+    notify  => Service['apache'],
+    require => Exec['create-forge-database'],
+  }
+
   file { $db:
     ensure  => file,
     owner   => $apache::params::user,
