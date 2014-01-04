@@ -34,7 +34,7 @@ class puppet::params {
       'datadir' => $hiera_datadir,
     }
   }
-  $hiera_hierarchy = ["'%{::fqdn}'", 'common']
+  $hiera_hierarchy = ["'%{::clientcert}'", 'common']
 
   case $::osfamily {
     openbsd: {
