@@ -11,13 +11,13 @@
 #  The name of the user to run the Puppet master as.  Defaults to 'puppet'.
 #
 # [*uid*]
-#  The uid to use for the Puppet user.  Defaults to '1001'.
+#  The uid to use for the Puppet user.  Defaults to '580'.
 #
 # [*group*]
 #  The name of the group to run the Puppet master as.  Defaults to 'puppet'.
 #
 # [*gid*]
-#  The gid to use for the Puppet group.  Defaults to '1001'.
+#  The gid to use for the Puppet group.  Defaults to '580'.
 #
 # [*confdir*]
 #  The path of the configuration directory, defaults to '/etc/puppet'.
@@ -63,7 +63,7 @@
 #  One of Puppet's main working directories.  Defaults to '/var/lib/puppet'.
 #
 # [*logdir*]
-#  Where the master should stor its logs.  Defaults to '/var/log/puppet'.
+#  Where the master should store its logs.  Defaults to '/var/log/puppet'.
 #
 # [*pluginsync*]
 #  Whether or not to enable `pluginsync` in the configuration file.
@@ -188,7 +188,6 @@ class puppet::master(
       'main' => {
         'certname'          => $certname,
         'confdir'           => $confdir,
-        'group'             => $group,
         'hiera_config'      => $hiera_config,
         'logdir'            => $logdir,
         'manifestdir'       => $manifestdir,
@@ -197,8 +196,12 @@ class puppet::master(
         'pluginsync'        => $pluginsync,
         'server'            => $certname,
         'ssldir'            => $ssldir,
-        'user'              => $user,
         'vardir'            => $vardir,
+      },
+      'master' => {
+        'user'              => $user,
+        'group'             => $group,
+        'trusted_node_data' => versioncmp($::puppetversion, '3.4.0') >= 0,
       }
     }
   }
@@ -222,11 +225,9 @@ class puppet::master(
 
   # Generate CA and certificates for the Puppet Master if they don't exist.
   exec { 'puppet-generate-certs':
-    # XXX: `puppet cert` command is deprecated in the future.
     command     => "puppet cert generate ${certname}",
     path        => ['/usr/sbin', '/usr/bin', '/sbin', '/bin', '/usr/local/bin'],
     creates     => "${ssldir}/ca",
-    refreshonly => true,
     user        => 'root',
     subscribe   => Sys::Inifile[$config_file],
   }
