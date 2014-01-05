@@ -3,9 +3,13 @@
 # Configures Apache to run the Puppet Master via Phusion Passenger.
 #
 class puppet::master::apache {
+  # As recommended in Pro Puppet.
   class { 'apache::passenger':
-    # As recommended in Pro Puppet, they be leaking.
-    max_requests => '4000',
+    max_requests   => '1000',
+    max_pool_size  => inline_template(
+      "<%= Integer(1.5 * Integer(scope.lookupvar('::processorcount'))) %>"
+    ),
+    pool_idle_time => '600',
   }
 
   include puppet::master::rack

@@ -8,14 +8,14 @@ Listen 8140
 
   SSLCertificateFile <%= scope.lookupvar('puppet::master::ssldir') %>/certs/<%= scope.lookupvar('puppet::master::certname') %>.pem
   SSLCertificateKeyFile <%= scope.lookupvar('puppet::master::ssldir') %>/private_keys/<%= scope.lookupvar('puppet::master::certname') %>.pem
-  SSLCertificateChainFile <%= scope.lookupvar('puppet::master::ssldir') %>/certs/ca.pem
+  SSLCertificateChainFile <%= scope.lookupvar('puppet::master::ssldir') %>/ca/ca_crt.pem
   SSLCACertificateFile <%= scope.lookupvar('puppet::master::ssldir') %>/ca/ca_crt.pem
 
   SSLCARevocationFile <%= scope.lookupvar('puppet::master::ssldir') %>/ca/ca_crl.pem
 
   SSLVerifyClient optional
   SSLVerifyDepth 1
-  SSLOptions +StdEnvVars
+  SSLOptions +StdEnvVars +ExportCertData
 
   RequestHeader set X-SSL-Subject %{SSL_CLIENT_S_DN}e
   RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
