@@ -4,7 +4,7 @@
 # from Puppet Labs.
 #
 class puppet::apt(
-  $url          = 'https://apt.puppetlabs.com/',
+  $url          = 'http://apt.puppetlabs.com/',
   $distribution = [$::lsbdistcodename],
   $components   = ['main'],
   $gpg_source   = 'puppet:///modules/puppet/apt/puppetlabs.gpg',
