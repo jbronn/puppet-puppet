@@ -111,11 +111,15 @@ class puppet::master(
   $master_extra       = {},
 ) inherits puppet::params {
 
-  # Puppet itself is required first; have any changes in its installation
-  # notify the Apache service.
+  # Puppet itself is required first.
   include puppet
   include puppet::master::apache
-  Class['puppet'] ~> Service['apache']
+
+  # XXX: Have changes in Puppet class notify Apache service, however
+  #  the following syntax does not work, errors out with
+  #  "Could not find resource 'Service[apache]' for relationship from
+  #   'Class[Puppet]'"
+  # Class['puppet'] ~> Service['apache']
 
   # Alias $home to $vardir.
   $home = $vardir
@@ -131,51 +135,59 @@ class puppet::master(
     ensure  => present,
     uid     => $uid,
     gid     => $gid,
-    home    => $vardir,
+    home    => $home,
     shell   => '/bin/false',
     require => Group[$group],
-  }
-
-  File {
-    owner   => $user,
-    group   => $group,
-    require => User[$user]
   }
 
   ## Puppet directories ##
   file { $confdir:
     ensure  => directory,
+    owner   => $user,
+    group   => $group,
     mode    => $confdir_mode,
   }
 
   file { $manifestdir:
     ensure  => directory,
+    owner   => $user,
+    group   => $group,
     mode    => $manifestdir_mode,
   }
 
   file { $modulepath:
     ensure  => directory,
+    owner   => $user,
+    group   => $group,
     mode    => $modulepath_mode,
   }
 
   file { $ssldir:
     ensure  => directory,
+    owner   => $user,
+    group   => $group,
     # Puppet always changes mode to this, not going to fight it.
     mode    => '0661',
   }
 
   file { $vardir:
     ensure  => directory,
+    owner   => $user,
+    group   => $group,
     mode    => '0640',
   }
 
   file { $logdir:
     ensure  => directory,
+    owner   => $user,
+    group   => $group,
     mode    => '0640',
   }
 
   file { $hiera_datadir:
     ensure  => directory,
+    owner   => $user,
+    group   => $group,
     mode    => $hiera_datadir_mode,
   }
 
