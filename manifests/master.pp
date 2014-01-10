@@ -70,8 +70,18 @@
 #  Defaults to true.
 #
 # [*config*]
-#  Advanced option to overide the hash used to create the master
-#  `sys::inifile` resource for puppet.conf.
+#  Advanced parameter to overide the hash used to create the puppet.conf
+#  with `sys::inifile` resource.
+#
+# [*main_extra*]
+#  Advanced option of extra options to merge with the default options
+#  for the 'main' section of puppet.conf.  Does not work with `config`
+#  parameter.
+#
+# [*master_extra*]
+#  Advanced parameter of extra options to merge with the default options
+#  for the 'master' section of puppet.conf.  Does not work with `config`
+#  parameter.
 #
 class puppet::master(
   $certname           = $puppet::params::certname,
@@ -97,11 +107,17 @@ class puppet::master(
   $logdir             = $puppet::params::logdir,
   $pluginsync         = $puppet::params::pluginsync,
   $config             = undef,
+  $main_extra         = {},
+  $master_extra       = {},
 ) inherits puppet::params {
 
-  # Puppet itself is required first.
+  # Puppet itself is required first; have any changes in its installation
+  # notify the Apache service.
   include puppet
   include puppet::master::apache
+  Class['puppet'] ~> Service['apache']
+
+  # Alias $home to $vardir.
   $home = $vardir
 
   # Puppet user/group settings.
@@ -184,25 +200,33 @@ class puppet::master(
   if $config {
     $config_hash = $config
   } else {
+    # Default configuration for 'main' section of puppet.conf.
+    $main_config = {
+      'certname'          => $certname,
+      'confdir'           => $confdir,
+      'hiera_config'      => $hiera_config,
+      'logdir'            => $logdir,
+      'manifestdir'       => $manifestdir,
+      'modulepath'        => $modulepath,
+      'module_repository' => $module_repository,
+      'pluginsync'        => $pluginsync,
+      'server'            => $certname,
+      'ssldir'            => $ssldir,
+      'vardir'            => $vardir,
+    }
+
+    # Default configuration for 'master' section of puppet.conf.
+    $master_config = {
+      'user'              => $user,
+      'group'             => $group,
+      'trusted_node_data' => versioncmp($::puppetversion, '3.4.0') >= 0,
+    }
+
+    # Constructing the puppet.conf inifile configuration hash with any
+    # 'extra' options (if specified).
     $config_hash = {
-      'main' => {
-        'certname'          => $certname,
-        'confdir'           => $confdir,
-        'hiera_config'      => $hiera_config,
-        'logdir'            => $logdir,
-        'manifestdir'       => $manifestdir,
-        'modulepath'        => $modulepath,
-        'module_repository' => $module_repository,
-        'pluginsync'        => $pluginsync,
-        'server'            => $certname,
-        'ssldir'            => $ssldir,
-        'vardir'            => $vardir,
-      },
-      'master' => {
-        'user'              => $user,
-        'group'             => $group,
-        'trusted_node_data' => versioncmp($::puppetversion, '3.4.0') >= 0,
-      }
+      'main'   => merge($main_config, $main_extra),
+      'master' => merge($master_config, $master_extra),
     }
   }
 
