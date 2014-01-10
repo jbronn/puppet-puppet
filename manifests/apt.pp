@@ -6,7 +6,6 @@
 class puppet::apt(
   $url          = 'http://apt.puppetlabs.com/',
   $distribution = [$::lsbdistcodename],
-  $components   = ['main', 'dependencies'],
   $gpg_source   = 'puppet:///modules/puppet/apt/puppetlabs.gpg',
 ) {
   include sys::apt::update
@@ -17,11 +16,18 @@ class puppet::apt(
 
   $sources = "${sys::apt::sources_d}/puppetlabs.list"
   sys::apt::sources { $sources:
-    repositories => [{
-      'uri'          => $url,
-      'distribution' => $distribution,
-      'components'   => $components,
-    }],
+    repositories => [
+      {
+        'uri'          => $url,
+        'distribution' => $distribution,
+        'components'   => ['main'],
+      },
+      {
+        'uri'          => $url,
+        'distribution' => $distribution,
+        'components'   => ['dependencies'],
+      },
+    ],
     source       => false,
     require      => Sys::Apt::Key[$gpg_source],
     notify       => Class['sys::apt::update'],
