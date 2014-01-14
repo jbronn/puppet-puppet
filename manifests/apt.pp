@@ -33,7 +33,7 @@ class puppet::apt(
     notify       => Class['sys::apt::update'],
   }
 
-  anchor { 'counsyl::ubuntu::pgdg::apt':
+  anchor { 'puppet::apt':
     require => Class['sys::apt::update'],
   }
 }
