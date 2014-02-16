@@ -15,7 +15,7 @@
 #  The path of the SSL private key file; requires `ssl_cert` parameter.
 #
 # [*ssl_chain*]
-#  The path of the SSL certificate chain file.
+#  The path of the SSL certificate chain file, undefined by default.
 #
 # [*processes*]
 #  The number of processes to allocate to mod_wsgi, defaults to 5.
@@ -169,7 +169,7 @@ class puppet::forge(
 
   if $template {
     $site_template = $template
-  } elsif $hsts and $ssl_cert and $ssl_chain {
+  } elsif $hsts and $ssl_cert and $ssl_key {
     $site_template = 'puppet/forge/forge_hsts.conf.erb'
   } else {
     $site_template = 'puppet/forge/forge.conf.erb'
