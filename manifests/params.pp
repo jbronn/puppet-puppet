@@ -44,7 +44,11 @@ class puppet::params {
       $gem = false
       $user = '_puppet'
       $group = '_puppet'
-      $package = 'ruby-puppet'
+      if versioncmp($::kernelmajversion, '5.4') >= 0 {
+        $package = 'puppet'
+      } else {
+        $package = 'ruby-puppet'
+      }
       $source = $sys::openbsd::pkg::source
       $version = $sys::openbsd::pkg::puppet
       $facter_version = $sys::openbsd::pkg::facter
