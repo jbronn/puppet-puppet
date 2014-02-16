@@ -175,22 +175,14 @@ class puppet::forge(
     $site_template = 'puppet/forge/forge.conf.erb'
   }
 
-  file { $site:
-    ensure  => file,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0644',
+  apache::site { 'forge':
+    ensure  => enabled,
     content => template($site_template),
-    notify  => Service['apache'],
-    require => [Class['apache::install'], Exec['create-forge-database']],
+    require => Exec['create-forge-database'],
   }
 
   apache::site { 'default':
-    ensure => disabled,
-  }
-
-  apache::site { 'forge':
-    ensure  => enabled,
-    require => File[$site],
+    ensure  => disabled,
+    require => Apache::Site['forge'],
   }
 }
