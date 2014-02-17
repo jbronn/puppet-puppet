@@ -17,7 +17,7 @@
 
 <% end -%>
   # Puppetboard WSGI configuration.
-  WSGIDaemonProcess puppetboard user=<%= @user %> group=<%= @user %> threads=<%= @threads %>
+  WSGIDaemonProcess puppetboard user=<%= @user %> group=<%= @group %> threads=<%= @threads %>
   WSGIProcessGroup puppetboard
   WSGIApplicationGroup %{GLOBAL}
   WSGIScriptAlias / <%= @puppetboard_wsgi %>
