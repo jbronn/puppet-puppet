@@ -1,9 +1,9 @@
 PUPPETDB_HOST = '<%= @puppetdb_host %>'
 PUPPETDB_PORT = <%= @puppetdb_port %>
-PUPPETDB_SSL_VERIFY = <% if @puppetdb_ssl_verify.is_a? String -%>'<%= @puppetdb_ssl_verify %>'<% elsif @puppetdb_ssl_verify -%>True<% else -%>False<% end -%>
-PUPPETDB_KEY = <%= if @puppetdb_key -%>'<%= @puppetdb_key %>'<% else -%>None<% end -%>
-PUPPETDB_CERT = <%= if @puppetdb_cert -%>'<%= @puppetdb_cert %>'<% else -%>None<% end -%>
+PUPPETDB_SSL_VERIFY = <% if @puppetdb_ssl_verify.is_a? String %>'<%= @puppetdb_ssl_verify %>'<% elsif @puppetdb_ssl_verify %>True<% else %>False<% end %>
+PUPPETDB_KEY = <% if @puppetdb_key %>'<%= @puppetdb_key %>'<% else %>None<% end %>
+PUPPETDB_CERT = <% if @puppetdb_cert %>'<%= @puppetdb_cert %>'<% else %>None<% end %>
 PUPPETDB_TIMEOUT = <%= @puppetdb_timeout %>
 UNRESPONSIVE_HOURS = <%= @unresponsive_hours %>
-ENABLE_QUERY = <% if @enable_query -%>True<% else -%>False<% end -%>
-LOGLEVEL = '<%= @loglevel %>'
+ENABLE_QUERY = <% if @enable_query %>True<% else %>False<% end %>
+LOGLEVEL = '<%= @log_level %>'

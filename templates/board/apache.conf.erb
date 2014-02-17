@@ -17,12 +17,12 @@
 
 <% end -%>
   # Puppetboard WSGI configuration.
-  WSGIDaemonProcess puppetboard user=<%= scope.lookupvar('apache::params::user') %> group=<%= scope.lookupvar('apache::params::user') %> threads=<%= @threads %>
+  WSGIDaemonProcess puppetboard user=<%= @user %> group=<%= @user %> threads=<%= @threads %>
   WSGIProcessGroup puppetboard
   WSGIApplicationGroup %{GLOBAL}
   WSGIScriptAlias / <%= @puppetboard_wsgi %>
 
-  # Allow Apache to access the directory with the WSGI file.
+  # Allow Apache to access to the WSGI file.
   <Directory <%= File.dirname(@puppetboard_wsgi) %>>
     Options -Indexes
     <Files <%= File.basename(@puppetboard_wsgi) %>>
@@ -43,4 +43,8 @@
   LogLevel warn
   ErrorLog <%= scope.lookupvar('apache::params::logs') %>/puppetboard_error.log
   CustomLog <%= scope.lookupvar('apache::params::logs') %>/puppetboard_access.log combined
+<%# Any extra Apache virtual host configuration goes here, if provided -%>
+<% if @vhost_extra -%>
+<%= @vhost_extra %>
+<% end -%>
 </VirtualHost>
