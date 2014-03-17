@@ -14,6 +14,9 @@
   SSLEngine on
   SSLCertificateFile <%= @ssl_cert %>
   SSLCertificateKeyFile <%= @ssl_key %>
+<%   if @ssl_chain -%>
+  SSLCertificateChainFile <%= @ssl_chain %>
+<%   end -%>
 
 <% end -%>
   # Puppetboard WSGI configuration.

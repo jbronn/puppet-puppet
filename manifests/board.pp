@@ -38,6 +38,7 @@ class puppet::board(
   $server_name          = $::fqdn,
   $server_admin         = "admin@${::domain}",
   $ssl_cert             = undef,
+  $ssl_chain            = undef,
   $ssl_key              = undef,
   $template             = undef,
   $threads              = 5,
