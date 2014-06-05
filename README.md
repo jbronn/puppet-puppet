@@ -8,7 +8,6 @@ Classes:
 * `puppet`: Installs or upgrades Puppet itself.
 * `puppet::agent`: Configures a Puppet agent.
 * `puppet::master`: Configures a Puppet master server.
-* `puppet::forge`: Configures a private [module forge](https://forge.puppetlabs.com) for your network, using [django-forge](https://github.com/jbronn/django-forge); requires the `counsyl-python` module.
 * `puppet::board`: Configures [puppetboard](https://github.com/nedap/puppetboard), a dashboard for [PuppetDB](https://docs.puppetlabs.com/puppetdb/); requires the `counsyl-python` module.
 
 Defined types:
