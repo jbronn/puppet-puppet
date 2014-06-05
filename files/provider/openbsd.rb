@@ -172,7 +172,7 @@ Puppet::Type.type(:package).provide :openbsd, :parent => Puppet::Provider::Packa
   end
 
   def uninstall
-    pkgdelete uninstall_options.flatten.compact.join(' '), @resource[:name]
+    pkgdelete (uninstall_options or []).flatten.compact.join(' '), @resource[:name]
   end
 
   def purge
