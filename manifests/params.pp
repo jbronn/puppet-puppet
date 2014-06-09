@@ -14,16 +14,22 @@ class puppet::params {
   # General Puppet configuration settings.
   $certname = $::fqdn
   $confdir = '/etc/puppet'
+  $fileserverconfig = "${confdir}/fileserver.conf"
   $logdir = '/var/log/puppet'
   $manifestdir = "${confdir}/manifests"
-  $fileserverconfig = "${confdir}/fileserver.conf"
   $modulepath = "${confdir}/modules"
   $pluginsync = true
   $report = true
   $server = "puppet.${::domain}"
   $ssldir = "${confdir}/ssl"
   $vardir = '/var/lib/puppet'
-  $module_repository = 'https://forge.puppetlabs.com'
+
+  # The following default settings depend on the version of Puppet.
+  if $versioncmp($::puppetversion, '3.6.0') >= 0 {
+    $module_repository = 'https://forgeapi.puppetlabs.com'
+  } else {
+    $module_repository = 'https://forge.puppetlabs.com'
+  }
 
   # Sensible Hiera default settings, mostly specific to the Puppet master.
   $hiera_config = "${confdir}/hiera.yaml"
