@@ -25,7 +25,7 @@ class puppet::params {
   $vardir = '/var/lib/puppet'
 
   # The following default settings depend on the version of Puppet.
-  if $versioncmp($::puppetversion, '3.6.0') >= 0 {
+  if versioncmp($::puppetversion, '3.6.0') >= 0 {
     $module_repository = 'https://forgeapi.puppetlabs.com'
   } else {
     $module_repository = 'https://forge.puppetlabs.com'
