@@ -1,40 +1,40 @@
 Listen 8140
 <VirtualHost *:8140>
-  ServerName <%= scope.lookupvar('puppet::master::certname') %>
+  ServerName <%= scope['puppet::master::certname'] %>
 
   SSLEngine on
-  SSLProtocol -ALL +SSLv3 +TLSv1
-  SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP
+  SSLProtocol ALL -SSLv2
+  SSLCipherSuite ALL:!aNULL:!eNULL:!DES:!3DES:!IDEA:!SEED:!DSS:!PSK:!RC4:!MD5:+HIGH:+MEDIUM:!LOW:!SSLv2:!EXP
+  SSLHonorCipherOrder on
 
-  SSLCertificateFile <%= scope.lookupvar('puppet::master::ssldir') %>/certs/<%= scope.lookupvar('puppet::master::certname') %>.pem
-  SSLCertificateKeyFile <%= scope.lookupvar('puppet::master::ssldir') %>/private_keys/<%= scope.lookupvar('puppet::master::certname') %>.pem
-  SSLCertificateChainFile <%= scope.lookupvar('puppet::master::ssldir') %>/ca/ca_crt.pem
-  SSLCACertificateFile <%= scope.lookupvar('puppet::master::ssldir') %>/ca/ca_crt.pem
-
-  SSLCARevocationFile <%= scope.lookupvar('puppet::master::ssldir') %>/ca/ca_crl.pem
-
+  SSLCertificateFile <%= scope['puppet::master::ssldir'] %>/certs/<%= scope['puppet::master::certname'] %>.pem
+  SSLCertificateKeyFile <%= scope['puppet::master::ssldir'] %>/private_keys/<%= scope['puppet::master::certname'] %>.pem
+  SSLCertificateChainFile <%= scope['puppet::master::ssldir'] %>/ca/ca_crt.pem
+  SSLCACertificateFile <%= scope['puppet::master::ssldir'] %>/ca/ca_crt.pem
+  SSLCARevocationFile <%= scope['puppet::master::ssldir'] %>/ca/ca_crl.pem
   SSLVerifyClient optional
   SSLVerifyDepth 1
   SSLOptions +StdEnvVars +ExportCertData
 
+  RequestHeader unset X-Forwarded-For
   RequestHeader set X-SSL-Subject %{SSL_CLIENT_S_DN}e
   RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
   RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
 
-<% if scope.lookupvar('ruby::passenger::version').start_with? '3' -%>
+<% if scope['ruby::passenger::version'].start_with? '3' -%>
   RackAutoDetect On
 <% else -%>
   PassengerEnabled On
 <% end -%>
-  DocumentRoot <%= scope.lookupvar('puppet::master::confdir') %>/rack/puppetmaster/public/
-  <Directory <%= scope.lookupvar('puppet::master::confdir') %>/rack/puppetmaster/>
+  DocumentRoot <%= scope['puppet::master::confdir'] %>/rack/puppetmaster/public/
+  <Directory <%= scope['puppet::master::confdir'] %>/rack/puppetmaster/>
     Options None
     AllowOverride None
     Order allow,deny
-    allow from all
+    Allow from all
   </Directory>
 
   LogLevel warn
-  ErrorLog <%= scope.lookupvar('puppet::master::logdir') %>/master_error.log
-  CustomLog <%= scope.lookupvar('puppet::master::logdir') %>/master_access.log combined
+  ErrorLog <%= scope['puppet::master::logdir'] %>/master_error.log
+  CustomLog <%= scope['puppet::master::logdir'] %>/master_access.log combined
 </VirtualHost>
