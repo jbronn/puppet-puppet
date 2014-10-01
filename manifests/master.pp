@@ -113,19 +113,6 @@ class puppet::master(
   $ssl_protocols      = $puppet::params::ssl_protocols,
 ) inherits puppet::params {
 
-  # Puppet itself is required first.
-  include puppet
-  include puppet::master::apache
-
-  # XXX: Have changes in Puppet class notify Apache service, however
-  #  the following syntax does not work, errors out with
-  #  "Could not find resource 'Service[apache]' for relationship from
-  #   'Class[Puppet]'"
-  # Class['puppet'] ~> Service['apache']
-
-  # Alias $home to $vardir.
-  $home = $vardir
-
   # Puppet user/group settings.
   group { $group:
     ensure  => present,
@@ -141,6 +128,19 @@ class puppet::master(
     shell   => '/bin/false',
     require => Group[$group],
   }
+
+  # Puppet itself is required first.
+  include puppet
+  include puppet::master::apache
+
+  # XXX: Have changes in Puppet class notify Apache service, however
+  #  the following syntax does not work, errors out with
+  #  "Could not find resource 'Service[apache]' for relationship from
+  #   'Class[Puppet]'"
+  # Class['puppet'] ~> Service['apache']
+
+  # Alias $home to $vardir.
+  $home = $vardir
 
   ## Puppet directories ##
   file { $confdir:

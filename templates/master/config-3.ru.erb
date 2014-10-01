@@ -5,6 +5,7 @@ $0 = "master"
 # ARGV << "--debug"
 
 ARGV << "--rack"
-ARGV << "--confdir" << "<%= scope.lookupvar('puppet::master::confdir') %>"
+ARGV << "--confdir" << "<%= scope['puppet::master::confdir'] %>"
+ARGV << "--vardir" << "<%= scope['puppet::master::vardir'] %>"
 require 'puppet/util/command_line'
 run Puppet::Util::CommandLine.new.execute

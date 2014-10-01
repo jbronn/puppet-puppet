@@ -4,15 +4,20 @@
 # and Phusion Passenger.
 #
 class puppet::master::rack {
-  $rackconf = "${puppet::master::confdir}/rack"
-  file { $rackconf:
+  if $apache::passenger::install_type == 'apt' {
+    $conf = '/usr/share/puppet/rack'
+  } else {
+    $conf = "${puppet::master::confdir}/rack"
+  }
+
+  file { $conf:
     ensure  => directory,
     owner   => $puppet::master::user,
     group   => $puppet::master::group,
     mode    => '0640',
   }
 
-  $puppetmaster = "${rackconf}/puppetmaster"
+  $puppetmaster = "${conf}/puppetmaster"
   file { $puppetmaster:
     ensure  => directory,
     owner   => $puppet::master::user,
