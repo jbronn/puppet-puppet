@@ -5,7 +5,7 @@
 #
 class puppet::apt(
   $url          = 'http://apt.puppetlabs.com/',
-  $distribution = [$::lsbdistcodename],
+  $distribution = $::lsbdistcodename,
   $gpg_source   = 'puppet:///modules/puppet/apt/puppetlabs.gpg',
 ) {
   include sys::apt::update
