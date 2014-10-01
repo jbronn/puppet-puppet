@@ -42,6 +42,16 @@ class puppet::params {
   }
   $hiera_hierarchy = ["'%{::clientcert}'", 'common']
 
+  # Master configuration variables.
+  $ssl_ciphers = [
+    'EDH+CAMELLIA', 'EDH+aRSA', 'EECDH+aRSA+AESGCM', 'EECDH+aRSA+SHA384',
+    'EECDH+aRSA+SHA256', 'EECDH', '+CAMELLIA256', '+AES256', '+CAMELLIA128',
+    '+AES128', '+SSLv3', '!aNULL', '!eNULL', '!LOW', '!3DES', '!MD5', '!EXP',
+    '!PSK', '!DSS', '!RC4', '!SEED', '!IDEA', '!ECDSA', 'kEDH',
+    'CAMELLIA256-SHA', 'AES256-SHA', 'CAMELLIA128-SHA', 'AES128-SHA'
+  ]
+  $ssl_protocols = ['ALL', '-SSLv2', '-SSLv3']
+
   case $::osfamily {
     openbsd: {
       # The packaged version works much better than installing

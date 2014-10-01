@@ -109,6 +109,8 @@ class puppet::master(
   $config             = undef,
   $main_extra         = {},
   $master_extra       = {},
+  $ssl_ciphers        = $puppet::params::ssl_ciphers,
+  $ssl_protocols      = $puppet::params::ssl_protocols,
 ) inherits puppet::params {
 
   # Puppet itself is required first.

@@ -3,8 +3,8 @@ Listen 8140
   ServerName <%= scope['puppet::master::certname'] %>
 
   SSLEngine on
-  SSLProtocol ALL -SSLv2
-  SSLCipherSuite ALL:!aNULL:!eNULL:!DES:!3DES:!IDEA:!SEED:!DSS:!PSK:!RC4:!MD5:+HIGH:+MEDIUM:!LOW:!SSLv2:!EXP
+  SSLProtocol <%= scope['puppet::master::ssl_protocols'].join(' ') %>
+  SSLCipherSuite <%= scope['puppet::master::ssl_ciphers'].join(':') %>
   SSLHonorCipherOrder on
 
   SSLCertificateFile <%= scope['puppet::master::ssldir'] %>/certs/<%= scope['puppet::master::certname'] %>.pem
