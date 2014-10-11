@@ -53,11 +53,18 @@ class puppet::params {
   $ssl_protocols = ['ALL', '-SSLv2', '-SSLv3']
 
   case $::osfamily {
-    openbsd: {
+    'Debian': {
+      $install_type = 'apt'
+      $user = 'puppet'
+      $group = 'puppet'
+      $package = 'puppet'
+      $version = 'installed'
+    }
+    'OpenBSD': {
       # The packaged version works much better than installing
       # from gem on OpenBSD.
       include sys::openbsd::pkg
-      $gem = false
+      $install_type = 'openbsd'
       $user = '_puppet'
       $group = '_puppet'
       if versioncmp($::kernelmajversion, '5.4') >= 0 {
@@ -67,20 +74,15 @@ class puppet::params {
       }
       $source = $sys::openbsd::pkg::source
       $version = $sys::openbsd::pkg::puppet
-      $facter_version = $sys::openbsd::pkg::facter
     }
     default: {
       # Try and use gem by default for everybody else.
-      $gem = true
+      $install_type = 'gem'
       $user = 'puppet'
       $group = 'puppet'
       # Use latest versions at time of installation -- but user
       # isn't stopped from changing class parameter.
       $version = 'installed'
-      $facter_version = 'installed'
-      $hiera_version = 'installed'
-      $json_version = 'installed'
-      $rgen_version = 'installed'
     }
   }
 }

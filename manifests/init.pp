@@ -5,12 +5,9 @@
 #
 # === Parameters
 #
-# [*gem*]
-#  Whether to install Puppet from gem, defaults to true.
+# [*install_type*]
 #
 # [*package*]
-#  If `$gem` is false, then the name of the package to install
-#  Puppet from.
 #
 # [*version*]
 #  The ensure value for the Puppet package resource, defaults
@@ -26,98 +23,38 @@
 #
 # [*json_version*]
 #  The ensure value for the json_pure gem package resource, defaults
-#  to 'installed'.
+#  to 'installed'.  Only applicable when installing via Ruby Gems.
 #
 # [*rgen_version*]
 #  The ensure value for the rgen gem package resource, defaults to
-#  'installed'.
+#  'installed'.  Only applicable when installing via Ruby Gems.
 #
 class puppet(
-  $gem            = $puppet::params::gem,
+  $install_type   = $puppet::params::install_type,
   $package        = $puppet::params::package,
   $version        = $puppet::params::version,
-  $facter_version = $puppet::params::facter_version,
-  $hiera_version  = $puppet::params::hiera_version,
-  $json_version   = $puppet::params::json_version,
-  $rgen_version   = $puppet::params::rgen_version,
+  $facter_version = 'installed',
+  $hiera_version  = 'installed',
+  $json_version   = 'installed',
+  $rgen_version   = 'installed',
 ) inherits puppet::params {
-  include ruby
+  anchor { 'puppet::install': }
 
-  if $gem {
-    # Install Puppet and prerequisites via gem.  Because different versions
-    # of Puppet require different gems (e.g., Puppet 3 uses Hiera), we need
-    # to declare arrays used to construct proper dependency variables.
-    package { 'facter':
-      ensure   => $facter_version,
-      provider => 'gem',
-      require  => Class['ruby'],
+  case $install_type {
+    'apt': {
+      include puppet::install::apt
+      Class['puppet::install::apt'] -> Anchor['puppet::install']
     }
-
-    $facter_require = [Package['facter']]
-
-    if ($version == 'installed' or versioncmp($version, '3.0.0') >= 0) {
-      # Puppet 3.0+ requires hiera and json_pure gems.
-      package { 'json_pure':
-        ensure   => $json_version,
-        provider => 'gem',
-        require  => Class['ruby'],
-      }
-
-      package { 'hiera':
-        ensure   => $hiera_version,
-        provider => 'gem',
-        require  => Package['json_pure'],
-      }
-
-      $hiera_require = [Package['hiera'], Package['json_pure']]
-
-      if ($version == 'installed' or versioncmp($version, '3.2.0') >= 0) {
-        # Puppet 3.2+ requres rgen.
-        package { 'rgen':
-          ensure   => $rgen_version,
-          provider => 'gem',
-          require  => Class['ruby'],
-        }
-
-        $rgen_require = [Package['rgen']]
-      } else {
-        $rgen_require = []
-      }
-    } else {
-      $hiera_require = []
-      $rgen_require  = []
+    'gem': {
+      include puppet::install::gem
+      Class['puppet::install::gem'] -> Anchor['puppet::install']
     }
-
-    # Using the `flatten()` function from the stdlib to properly set up the
-    # the `$puppet_require` and `$cleanup_subscribe` lists.
-    $puppet_require = flatten(
-      [Class['ruby'], $facter_require, $hiera_require, $rgen_require]
-    )
-    $cleanup_subscribe = flatten(
-      [Package['puppet'], $facter_require, $hiera_require, $rgen_require]
-    )
-
-    package { 'puppet':
-      ensure   => $version,
-      provider => 'gem',
-      require  => $puppet_require,
+    'openbsd': {
+      include puppet::install::openbsd
+      Class['puppet::install::openbsd'] -> Anchor['puppet::install']
     }
-
-    # Uninstall old gem versions of Puppet/Facter automatically.
-    exec { 'puppet-cleanup':
-      command     => 'gem cleanup puppet facter hiera json_pure',
-      path        => ['/bin', '/usr/bin'],
-      refreshonly => true,
-      subscribe   => $cleanup_subscribe,
+    default: {
+      fail("Unable to install Puppet on ${::operatingsystem}.\n")
     }
-  } elsif $package {
-    # Install Puppet via OS package.
-    package { $package:
-      ensure  => $version,
-      alias   => 'puppet',
-      require => Class['ruby'],
-    }
-  } else {
-    fail("Unable to install Puppet on ${::operatingsystem}.\n")
   }
 }

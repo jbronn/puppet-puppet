@@ -21,13 +21,9 @@ Listen 8140
   RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
   RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
 
-<% if scope['ruby::passenger::version'].start_with? '3' -%>
-  RackAutoDetect On
-<% else -%>
   PassengerEnabled On
-<% end -%>
-  DocumentRoot <%= scope['puppet::master::confdir'] %>/rack/puppetmaster/public/
-  <Directory <%= scope['puppet::master::confdir'] %>/rack/puppetmaster/>
+  DocumentRoot <%= scope['puppet::master::rack::puppetmaster'] %>/public/
+  <Directory <%= scope['puppet::master::rack::puppetmaster'] %>/>
     Options None
     AllowOverride None
     Order allow,deny
@@ -35,6 +31,6 @@ Listen 8140
   </Directory>
 
   LogLevel warn
-  ErrorLog <%= scope['puppet::master::logdir'] %>/master_error.log
-  CustomLog <%= scope['puppet::master::logdir'] %>/master_access.log combined
+  ErrorLog <%= scope['apache::params::logs'] %>/master_error.log
+  CustomLog <%= scope['apache::params::logs'] %>/master_access.log combined
 </VirtualHost>

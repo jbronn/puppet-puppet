@@ -2,23 +2,40 @@
 #
 # Configures Apache to run the Puppet Master via Phusion Passenger.
 #
-class puppet::master::apache {
-  # As recommended in Pro Puppet.
-  class { 'apache::passenger':
-    max_requests   => '1000',
-    max_pool_size  => inline_template(
-      "<%= Integer(1.5 * Integer(scope.lookupvar('::processorcount'))) %>"
-    ),
-    pool_idle_time => '600',
+class puppet::master::apache(
+  $max_requests   = 1000,
+  $max_pool_size  = inline_template(
+    "<%= Integer(1.5 * Integer(scope['::processorcount'])) %>"
+  ),
+  $pool_idle_time = 1500,
+) {
+  # Configure Phusion Passenger as recommended by Pro Puppet.
+  class { '::apache::passenger':
+    max_requests   => $max_requests,
+    max_pool_size  => $max_pool_size,
+    pool_idle_time => $pool_idle_time,
+  }
+
+  # Notify Apache on any changes in Puppet install itself.
+  Class['puppet'] ~> Service[$apache::params::service]
+
+  # This Puppet Labs package generates certs and does other legwork
+  # to run a Puppet master under Apache and Phusion Passenger.
+  if $::apache::passenger::install_type == 'apt' {
+    package { 'puppetmaster-passenger':
+      ensure  => installed,
+      before  => Class['puppet::master::rack'],
+      require => Class['::apache::passenger'],
+    }
   }
 
   include puppet::master::rack
 
   # So Apache user can read puppet files.
-  user { $apache::params::user:
+  user { $::apache::params::user:
     ensure  => present,
     groups  => [$puppet::master::group],
-    require => [Class['apache::install'],
+    require => [Class['::apache::install'],
                 Group[$puppet::master::group]],
   }
 
@@ -41,38 +58,25 @@ class puppet::master::apache {
   }
 
   # Create Puppet Master site configuration and enable it.
-  $puppetmaster = "${apache::params::sites_available}/puppetmaster"
-  file { $puppetmaster:
-    ensure  => file,
-    mode    => '0644',
-    owner   => 'root',
-    group   => 'root',
-    content => template('puppet/master/puppetmaster.conf.erb'),
-  }
-
   apache::site { 'puppetmaster':
     ensure  => present,
-    require => [Class['apache::passenger'],
-                Class['puppet::master::rack'],
-                File[$puppetmaster]],
+    content => template('puppet/master/puppetmaster.conf.erb'),
+    require => Class['::apache::passenger', 'puppet::master::rack'],
   }
 
   # OS-dependent settings.
   case $::osfamily {
     debian: {
       # Only listen on port 8140.
-      file { "${apache::params::server_root}/ports.conf":
+      file { "${::apache::params::server_root}/ports.conf":
         ensure  => file,
         mode    => '0644',
         owner   => 'root',
         group   => 'root',
         content => "\n",
-        require => Class['apache::install'],
-        notify  => Service['apache'],
+        require => Class['::apache::install'],
+        notify  => Service[$::apache::params::service],
       }
-    }
-    redhat: {
-      include puppet::master::redhat
     }
     default: {
       fail("Can't install the Puppet Master with Apache on ${::osfamily}.\n")
