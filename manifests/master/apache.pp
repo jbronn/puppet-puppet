@@ -3,7 +3,6 @@
 # Configures Apache to run the Puppet Master via Phusion Passenger.
 #
 class puppet::master::apache(
-  $install_type   = 'gem',
   $max_requests   = 1000,
   $max_pool_size  = inline_template(
     "<%= Integer(1.5 * Integer(scope['::processorcount'])) %>"
@@ -12,13 +11,17 @@ class puppet::master::apache(
 ) {
   # Configure Phusion Passenger as recommended by Pro Puppet.
   class { '::apache::passenger':
-    install_type   => $install_type,
     max_requests   => $max_requests,
     max_pool_size  => $max_pool_size,
     pool_idle_time => $pool_idle_time,
   }
 
-  if $install_type == 'apt' {
+  # Notify Apache on any changes in Puppet install itself.
+  Class['puppet'] ~> Service[$apache::params::service]
+
+  # This Puppet Labs package generates certs and does other legwork
+  # to run a Puppet master under Apache and Phusion Passenger.
+  if $::apache::passenger::install_type == 'apt' {
     package { 'puppetmaster-passenger':
       ensure  => installed,
       before  => Class['puppet::master::rack'],

@@ -113,10 +113,17 @@ class puppet::master(
   $ssl_protocols      = $puppet::params::ssl_protocols,
 ) inherits puppet::params {
 
+  # Puppet itself is required first.
+  include puppet
+
+  # Alias $home to $vardir.
+  $home = $vardir
+
   # Puppet user/group settings.
   group { $group:
     ensure  => present,
     gid     => $gid,
+    before  => Class['puppet::master::apache'],
     require => Class['puppet'],
   }
 
@@ -126,21 +133,11 @@ class puppet::master(
     gid     => $gid,
     home    => $home,
     shell   => '/bin/false',
+    before  => Class['puppet::master::apache'],
     require => Group[$group],
   }
 
-  # Puppet itself is required first.
-  include puppet
   include puppet::master::apache
-
-  # XXX: Have changes in Puppet class notify Apache service, however
-  #  the following syntax does not work, errors out with
-  #  "Could not find resource 'Service[apache]' for relationship from
-  #   'Class[Puppet]'"
-  # Class['puppet'] ~> Service['apache']
-
-  # Alias $home to $vardir.
-  $home = $vardir
 
   ## Puppet directories ##
   file { $confdir:
@@ -262,6 +259,8 @@ class puppet::master(
   }
 
   # Generate CA and certificates for the Puppet Master if they don't exist.
+  # This should not be necessary where Puppet Master / Passenger are
+  # installed via apt.
   exec { 'puppet-generate-certs':
     command     => "puppet cert generate ${certname}",
     path        => ['/usr/sbin', '/usr/bin', '/sbin', '/bin', '/usr/local/bin'],
