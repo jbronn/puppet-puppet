@@ -61,19 +61,27 @@ class puppet::params {
       $version = 'installed'
     }
     'OpenBSD': {
-      # The packaged version works much better than installing
-      # from gem on OpenBSD.
+      # The packaged version works much better than installing from gem.
       include sys::openbsd::pkg
       $install_type = 'openbsd'
       $user = '_puppet'
       $group = '_puppet'
-      if versioncmp($::kernelmajversion, '5.4') >= 0 {
-        $package = 'puppet'
-      } else {
-        $package = 'ruby-puppet'
+      $package = 'puppet'
+
+      case $::kernelmajversion {
+        '5.7': {
+          $version = '3.7.4p0'
+        }
+        '5.6': {
+          $version = '3.6.2p3'
+        }
+        '5.5': {
+          $version = '3.4.2'
+        }
+        default: {
+          fail("Unsupported version of OpenBSD: ${::kernelmajversion}.\n")
+        }
       }
-      $source = $sys::openbsd::pkg::source
-      $version = $sys::openbsd::pkg::puppet
     }
     default: {
       # Try and use gem by default for everybody else.
