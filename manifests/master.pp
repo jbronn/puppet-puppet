@@ -217,7 +217,7 @@ class puppet::master(
       'confdir'           => $confdir,
       'hiera_config'      => $hiera_config,
       'logdir'            => $logdir,
-      'manifestdir'       => $manifestdir,
+      'manifest'          => $manifestdir,
       'modulepath'        => $modulepath,
       'module_repository' => $module_repository,
       'pluginsync'        => $pluginsync,
