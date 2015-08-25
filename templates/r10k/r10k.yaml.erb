@@ -11,9 +11,11 @@ end
 -%>
 <% if @postrun.count > 0 -%>
 postrun: [<%= (@postrun.collect { |cmd| "\"#{cmd}\"" }).join(', ') %>]
+
 <% end -%>
 <% if @cachedir -%>
 cachedir: <%= @cachedir %>
+
 <% end -%>
 <% if @sources.count > 0-%>
 sources:
@@ -26,12 +28,14 @@ sources:
 <%       end -%>
 <%     end -%>
 <%   end -%>
+
 <% end -%>
 <% if @forge.count > 0 -%>
 forge:
 <%   @forge.sort.each do |key, value| -%>
   <%= key -%>: <%= quote_setting(value) %>
 <%   end -%>
+
 <% end -%>
 <% if @git.count > 0 -%>
 git:
