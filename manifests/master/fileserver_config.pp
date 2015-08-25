@@ -1,7 +1,7 @@
-# == Define: puppet::fileserver_config
+# == Define: puppet::master::fileserver_config
 #
-# Generates the Puppet master file server configuration file
-# (e.g., /etc/puppet/fileserver.conf).
+# Generates the Puppet master fileserver configuration file, at the path of
+# the resource's title, e.g., '/etc/puppet/fileserver.conf'.
 #
 # === Parameters
 #
@@ -10,33 +10,34 @@
 #  values are hashes with ('path','allow','deny') values.
 #
 # [*owner*]
-#  The owner of the fileserver configuration file at $name.
-#  Defaults to 'puppet'.
+#  The owner of the fileserver configuration file, defaults to 'puppet'.
 #
 # [*group*]
-#  The group of the fileserver configuration file at $name.
-#  Defaults to 'puppet'.
+#  The group of the fileserver configuration file, defaults to 'puppet'.
 #
 # [*mode*]
 #  The mode of the configuration file.  Defaults to '0640'.
 #
 # [*header*]
 #  The header of the configuration file, Defaults to:
-#  "# Created by puppet::fileserver_config; do not modify.".
+#  "# Created by puppet::master::fileserver_config; do not modify.".
 #
 # [*template*]
 #  The template used to generate the configuration file.  Defaults to:
 #  'puppet/master/fileserver.conf.erb'.  Advanced usage only.
 #
-define puppet::fileserver_config(
+define puppet::master::fileserver_config(
   $mounts,
   $owner    = 'puppet',
   $group    = 'puppet',
   $mode     = '0640',
-  $header   = '# Created by puppet::fileserver_config; do not modify.',
+  $header   = '# Created by puppet::master::fileserver_config; do not modify.',
   $template = 'puppet/master/fileserver.conf.erb'
 ){
-  file { $name:
+  validate_absolute_path($title)
+  validate_hash($mounts)
+
+  file { $title:
     ensure  => file,
     owner   => $owner,
     group   => $group,

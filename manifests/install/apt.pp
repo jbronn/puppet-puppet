@@ -6,7 +6,6 @@ class puppet::install::apt(
   $common_package = 'puppet-common',
   $facter_package = 'facter',
   $hiera_package  = 'hiera',
-  $rgen_package   = 'ruby-rgen',
   $suffix         = '1puppetlabs1'
 ) {
   if $::osfamily != 'Debian' {

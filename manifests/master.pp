@@ -141,53 +141,53 @@ class puppet::master(
 
   ## Puppet directories ##
   file { $confdir:
-    ensure  => directory,
-    owner   => $user,
-    group   => $group,
-    mode    => $confdir_mode,
+    ensure => directory,
+    owner  => $user,
+    group  => $group,
+    mode   => $confdir_mode,
   }
 
   file { $manifestdir:
-    ensure  => directory,
-    owner   => $user,
-    group   => $group,
-    mode    => $manifestdir_mode,
+    ensure => directory,
+    owner  => $user,
+    group  => $group,
+    mode   => $manifestdir_mode,
   }
 
   file { $modulepath:
-    ensure  => directory,
-    owner   => $user,
-    group   => $group,
-    mode    => $modulepath_mode,
+    ensure => directory,
+    owner  => $user,
+    group  => $group,
+    mode   => $modulepath_mode,
   }
 
   file { $ssldir:
-    ensure  => directory,
-    owner   => $user,
-    group   => $group,
+    ensure => directory,
+    owner  => $user,
+    group  => $group,
     # Puppet always changes mode to this, not going to fight it.
-    mode    => '0661',
+    mode   => '0661',
   }
 
   file { $vardir:
-    ensure  => directory,
-    owner   => $user,
-    group   => $group,
-    mode    => '0640',
+    ensure => directory,
+    owner  => $user,
+    group  => $group,
+    mode   => '0640',
   }
 
   file { $logdir:
-    ensure  => directory,
-    owner   => $user,
-    group   => $group,
-    mode    => '0640',
+    ensure => directory,
+    owner  => $user,
+    group  => $group,
+    mode   => '0640',
   }
 
   file { $hiera_datadir:
-    ensure  => directory,
-    owner   => $user,
-    group   => $group,
-    mode    => $hiera_datadir_mode,
+    ensure => directory,
+    owner  => $user,
+    group  => $group,
+    mode   => $hiera_datadir_mode,
   }
 
   ## Puppet configuration files ##
@@ -262,10 +262,10 @@ class puppet::master(
   # This should not be necessary where Puppet Master / Passenger are
   # installed via apt.
   exec { 'puppet-generate-certs':
-    command     => "puppet cert generate ${certname}",
-    path        => ['/usr/sbin', '/usr/bin', '/sbin', '/bin', '/usr/local/bin'],
-    creates     => "${ssldir}/ca",
-    user        => 'root',
-    subscribe   => Sys::Inifile[$config_file],
+    command   => "puppet cert generate ${certname}",
+    path      => ['/usr/sbin', '/usr/bin', '/sbin', '/bin', '/usr/local/bin'],
+    creates   => "${ssldir}/ca",
+    user      => 'root',
+    subscribe => Sys::Inifile[$config_file],
   }
 }

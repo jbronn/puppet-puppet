@@ -1,28 +1,26 @@
 ---
-<% if @backends -%>
+<% if @backends.count > 0 -%>
 :backends:
-<% @backends.each do |backend| -%>
+<%   @backends.each do |backend| -%>
   - <%= backend %>
-<% end -%>
-<% if @settings.is_a? Hash -%>
-<% @backends.each do |backend| -%>
-<% if @settings.has_key? backend -%>
+<%   end
+   end -%>
+<% if @settings.count > 0
+     @backends.each do |backend|
+       if @settings.has_key?(backend) -%>
 :<%= backend %>:
-<% @settings[backend].keys.each do |setting| -%>
+<%       @settings[backend].keys.sort.each do |setting| -%>
   :<%= setting %>: <%= @settings[backend][setting] %>
-<% end -%>
-<% end -%>
-<% end -%>
-<% end -%>
-<% end -%>
-<% if @hierarchy.is_a? Array -%>
+<%       end
+       end
+     end
+   end -%>
+<% if @hierarchy.count > 0 -%>
 :hierarchy:
-<% @hierarchy.each do |hierarchy_source| -%>
+<%   @hierarchy.each do |hierarchy_source| -%>
   - <%= hierarchy_source %>
-<% end -%>
-<% else -%>
-:hierarchy: <%= @hierarchy %>
-<% end -%>
+<%   end
+   end -%>
 <% if @logger %>
 :logger: <%= @logger %>
 <% end -%>

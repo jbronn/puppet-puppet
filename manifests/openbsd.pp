@@ -13,12 +13,12 @@ class puppet::openbsd {
   # ages, so this will still be necessary for versions prior to 3.5.0.
   if versioncmp($::puppetversion, '3.5.0') < 0 {
     file { "${::rubysitedir}/puppet/provider/package/openbsd.rb":
-      ensure  => file,
-      owner   => 'root',
-      group   => 'wheel',
-      mode    => '0644',
-      alias   => 'openbsd-package-provider-fix',
-      source  => 'puppet:///modules/puppet/provider/openbsd.rb',
+      ensure => file,
+      owner  => 'root',
+      group  => 'wheel',
+      mode   => '0644',
+      alias  => 'openbsd-package-provider-fix',
+      source => 'puppet:///modules/puppet/provider/openbsd.rb',
     }
   }
 }

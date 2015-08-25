@@ -1,0 +1,28 @@
+{
+  "name": "counsyl-puppet",
+  "version": "0.9.9",
+  "source": "git://github.com/counsyl/puppet-puppet.git",
+  "author": "Counsyl, Inc.",
+  "license": "Apache-2.0",
+  "summary": "Manages Puppet infrastructure",
+  "description": "Manages Puppet infrastructure",
+  "project_page": "https://github.com/counsyl/puppet-puppet",
+  "dependencies": [
+    {"name": "counsyl/apache", "version_requirement": ">= 0.9.5 <2.0.0"},
+    {"name": "counsyl/ruby", "version_requirement": ">= 0.9.12 <2.0.0"}
+  ],
+  "operatingsystem_support": [
+      {
+          "operatingsystem": "Darwin"
+      },
+      {
+          "operatingsystem": "Debian"
+      },
+      {
+          "operatingsystem": "OpenBSD"
+      },
+      {
+          "operatingsystem": "Ubuntu"
+      }
+  ]
+}

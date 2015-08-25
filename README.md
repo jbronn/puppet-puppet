@@ -12,7 +12,7 @@ Classes:
 
 Defined types:
 
-* `puppet::fileserver_config`: Generates a [fileserver configuration file](http://docs.puppetlabs.com/guides/file_serving.html) for use by a Puppet master.
+* `puppet::master::fileserver_config`: Generates a [fileserver configuration file](http://docs.puppetlabs.com/guides/file_serving.html) for use by a Puppet master.
 * `puppet::hiera_config`: Generates a [hiera.yaml](http://docs.puppetlabs.com/hiera/1/configuring.html) configuration file.
 
 
