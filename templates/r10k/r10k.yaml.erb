@@ -16,7 +16,7 @@ postrun: [<%= (@postrun.collect { |cmd| "\"#{cmd}\"" }).join(', ') %>]
 cachedir: <%= @cachedir %>
 <% end -%>
 <% if @sources.count > 0-%>
-:sources:
+sources:
 <%   @sources.keys.sort.each do |source| -%>
 <%     source_data = @sources[source]
        if ! source_data.empty? -%>
