@@ -34,6 +34,7 @@ define puppet::master::fileserver_config(
   $header   = '# Created by puppet::master::fileserver_config; do not modify.',
   $template = 'puppet/master/fileserver.conf.erb'
 ){
+  validate_absolute_path($title)
   validate_hash($mounts)
 
   file { $title:
