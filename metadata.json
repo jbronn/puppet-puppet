@@ -1,6 +1,6 @@
 {
   "name": "counsyl-puppet",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "source": "git://github.com/counsyl/puppet-puppet.git",
   "author": "Counsyl, Inc.",
   "license": "Apache-2.0",
