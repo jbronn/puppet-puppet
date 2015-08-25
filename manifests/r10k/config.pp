@@ -18,10 +18,6 @@
 # [*mode*]
 #  Mode of r10k config file, defaults to '0600'.
 #
-# [*source*]
-#  Advanced usage only, specifies the puppet file source for the r10k
-#  configuration file; undefined by default.
-#
 # [*template*]
 #  Advanced usage only, the template used to generate the r10k
 #  configuration file; defaults to 'puppet/r10k/r10k.yaml.erb'.
@@ -35,7 +31,6 @@ define puppet::r10k::config(
   $owner    = undef,
   $group    = undef,
   $mode     = '0600',
-  $source   = undef,
   $template = 'puppet/r10k/r10k.yaml.erb',
 ) {
   validate_absolute_path($title)
@@ -51,7 +46,6 @@ define puppet::r10k::config(
     owner   => $owner,
     group   => $group,
     mode    => $mode,
-    source  => $source,
     content => template($template),
   }
 }
