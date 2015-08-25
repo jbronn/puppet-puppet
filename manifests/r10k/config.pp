@@ -1,6 +1,9 @@
 # == Define: puppet::r10k::config
 #
-# Generates a
+# Generates a configuration file for use with r10k.  For more details
+# on the configuration file format, consult:
+#
+#  https://github.com/puppetlabs/r10k/blob/master/doc/dynamic-environments/configuration.mkd
 #
 # === Parameters
 #
@@ -8,7 +11,17 @@
 #  The path to use for the r10k cache directory, false by default.
 #
 # [*forge*]
-# 
+#  Hash of forge options for r10k, defaults to {}.
+#
+# [*git*]
+#  Hash of git options for r10k, defaults to {}.
+#
+# [*postrun*]
+#  Array of commands to provide for the postrun option, defaults to [].
+#
+# [*sources*]
+#  Hash of the dynamic environment sources for r10k, defaults to {}.
+#
 # [*owner*]
 #  Owner of r10k config file, undefined by default.
 #
@@ -26,8 +39,8 @@ define puppet::r10k::config(
   $cachedir = false,
   $forge    = {},
   $git      = {},
-  $sources  = {},
   $postrun  = [],
+  $sources  = {},
   $owner    = undef,
   $group    = undef,
   $mode     = '0600',
