@@ -16,7 +16,7 @@ class puppet::conf::r10k(
 
   create_resources('puppet::r10k::config',
     {
-      $puppet::params::r10k_config_file => $settings
+      "${puppet::params::r10k_config_file}" => $settings
     }
   )
 }
