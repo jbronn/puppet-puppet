@@ -11,33 +11,31 @@ class puppet::params {
   $gid = '580'
   $root_group = $sys::root_group
 
+  # Root directory for all open source Puppet Labs products
+  $puppetlabs = '/etc/puppetlabs'
+
   # General Puppet configuration settings.
-  $certname = $::fqdn
-  $confdir = '/etc/puppet'
+  $basemodulepath = "${codedir}/modules"
+  $codedir = "${puppetlabs}/code"
+  $confdir = "${puppetlabs}/puppet"
+  $config_file = "${confdir}/puppet.conf"
+  $environmentpath = "${codedir}/environments"
   $fileserverconfig = "${confdir}/fileserver.conf"
   $logdir = '/var/log/puppet'
-  $manifestdir = "${confdir}/manifests"
-  $modulepath = "${confdir}/modules"
-  $pluginsync = true
-  $report = true
-  $server = "puppet.${::domain}"
+  $module_repository = 'https://forgeapi.puppetlabs.com'
   $ssldir = "${confdir}/ssl"
   $vardir = '/var/lib/puppet'
 
-  # The following default settings depend on the version of Puppet.
-  if versioncmp($::puppetversion, '3.6.0') >= 0 {
-    $module_repository = 'https://forgeapi.puppetlabs.com'
-  } else {
-    $module_repository = 'https://forge.puppetlabs.com'
-  }
+  # r10k settings
+  $r10k_confdir = "${puppetlabs}/r10k"
+  $r10k_config_file = "${r10k_confdir}/r10k.yaml"
 
   # Sensible Hiera default settings, mostly specific to the Puppet master.
-  $hiera_config = "${confdir}/hiera.yaml"
-  $hiera_datadir = "${confdir}/hiera"
+  $hiera_config = "${codedir}/hiera.yaml"
   $hiera_backends = ['yaml']
   $hiera_settings = {
     'yaml'   => {
-      'datadir' => $hiera_datadir,
+      'datadir' => "\"${environmentpath}/%{::environment}/hieradata\"",
     }
   }
   $hiera_hierarchy = ["'%{::clientcert}'", 'common']
