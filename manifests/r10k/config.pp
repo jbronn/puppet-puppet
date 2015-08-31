@@ -29,7 +29,7 @@
 #  Group of r10k config file, undefined by default.
 #
 # [*mode*]
-#  Mode of r10k config file, defaults to '0600'.
+#  Mode of r10k config file, defaults to '0644'.
 #
 # [*template*]
 #  Advanced usage only, the template used to generate the r10k
@@ -43,7 +43,7 @@ define puppet::r10k::config(
   $sources  = {},
   $owner    = undef,
   $group    = undef,
-  $mode     = '0600',
+  $mode     = '0644',
   $template = 'puppet/r10k/r10k.yaml.erb',
 ) {
   validate_absolute_path($title)

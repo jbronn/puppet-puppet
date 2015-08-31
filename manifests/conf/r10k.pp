@@ -1,8 +1,28 @@
+# == Class: puppet::conf::r10k
+#
+# Creates the default global r10k configuration directory and file:
+#
+#   /etc/puppetlabs/r10k/r10k.yaml
+#
+# === Parameters
+#
+# [*group*]
+#  The group for the global r10k configuration file and directory resources,
+#  defaults is platform's superuser group ('root' on Linux, 'wheel' on UNIX).
+#
+# [*mode*]
+#  The mode for the global r10k configuration file and directory resources,
+#  defaults to '0644'.
+#
+# [*settings*]
+#  TODO
+#
 class puppet::conf::r10k(
-  $group    = $puppet::params::group,
-  $mode     = '0640',
+  $group    = $puppet::params::root_group,
+  $mode     = '0644',
   $settings = {},
 ) inherits puppet::params {
+  validate_hash($settings)
 
   include puppet::conf::puppetlabs
 
