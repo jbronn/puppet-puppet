@@ -1,4 +1,4 @@
-# == Class: puppet::conf::r10k
+# == Class: puppet::config::r10k
 #
 # Creates the default global r10k configuration directory and file:
 #
@@ -15,28 +15,36 @@
 #  defaults to '0644'.
 #
 # [*settings*]
-#  TODO
+#  A hash of settings to pass to the `puppet::r10k::config` defined type,
+#  (to pupulate the actual settings in r10k.yaml), defaults to {}.
 #
-class puppet::conf::r10k(
+class puppet::config::r10k(
   $group    = $puppet::params::root_group,
   $mode     = '0644',
   $settings = {},
 ) inherits puppet::params {
   validate_hash($settings)
 
-  include puppet::conf::puppetlabs
+  include puppet::config::puppetlabs
 
   file { $puppet::params::r10k_confdir:
     ensure  => directory,
     owner   => 'root',
     group   => $group,
     mode    => $mode,
-    require => Class['puppet::conf::puppetlabs'],
+    require => Class['puppet::config::puppetlabs'],
   }
+
+  $config_settings = merge($settings,
+    {
+      'group' => $group,
+      'mode'  => $mode,
+    }
+  )
 
   create_resources('puppet::r10k::config',
     {
-      "${puppet::params::r10k_config_file}" => $settings
+      "${puppet::params::r10k_config_file}" => $config_settings,
     }
   )
 }

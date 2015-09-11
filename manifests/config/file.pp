@@ -1,12 +1,12 @@
-# == Class: puppet::conf::file
+# == Class: puppet::config::file
 #
 # Creates the configuration file for Puppet itself.
 #
-class puppet::conf::file(
+class puppet::config::file(
   $group = $puppet::params::root_group,
   $mode  = '0644',
 ) inherits puppet::params {
-  include puppet::conf::dir
+  include puppet::config::dir
 
   # Ensure the puppet configuration file exists, but don't manage
   # its content
@@ -15,7 +15,7 @@ class puppet::conf::file(
     owner   => 'root',
     group   => $group,
     mode    => $mode,
-    require => Class['puppet::conf::dir'],
+    require => Class['puppet::config::dir'],
   }
 
   if versioncmp($::puppetversion, '4.0.0') < 0 {
@@ -24,8 +24,8 @@ class puppet::conf::file(
     file { '/etc/puppet':
       ensure => directory,
       owner  => 'root',
-      group  => $puppet::conf::dir::group,
-      mode   => $puppet::conf::dir::_mode,
+      group  => $puppet::config::dir::group,
+      mode   => $puppet::config::dir::_mode,
     }
 
     file { '/etc/puppet/puppet.conf':
@@ -37,5 +37,5 @@ class puppet::conf::file(
 
   # Ensure configuration directory / file scaffolding is in place
   # prior to using the `puppet_setting` type.
-  Class['puppet::conf::file'] -> Puppet_setting<| |>
+  Class['puppet::config::file'] -> Puppet_setting<| |>
 }
