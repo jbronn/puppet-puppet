@@ -2,6 +2,8 @@
 #
 # Configures Apache to run the Puppet Master via Phusion Passenger.
 #
+# TODO: Use the puppetlabs-apache module.
+#
 class puppet::master::apache(
   $max_requests   = 1000,
   $max_pool_size  = inline_template(
@@ -9,52 +11,37 @@ class puppet::master::apache(
   ),
   $pool_idle_time = 1500,
 ) {
+  include puppet::params
+
   # Configure Phusion Passenger as recommended by Pro Puppet.
   class { '::apache::passenger':
+    install_type   => 'apt',
     max_requests   => $max_requests,
     max_pool_size  => $max_pool_size,
     pool_idle_time => $pool_idle_time,
   }
 
   # Notify Apache on any changes in Puppet install itself.
-  Class['puppet'] ~> Service[$apache::params::service]
-
-  # This Puppet Labs package generates certs and does other legwork
-  # to run a Puppet master under Apache and Phusion Passenger.
-  if $::apache::passenger::install_type == 'apt' {
-    package { 'puppetmaster-passenger':
-      ensure  => installed,
-      before  => Class['puppet::master::rack'],
-      require => Class['::apache::passenger'],
-    }
-  }
+  Class['puppet::install'] ~> Service[$::apache::params::service]
 
   include puppet::master::rack
 
   # So Apache user can read puppet files.
   user { $::apache::params::user:
     ensure  => present,
-    groups  => [$puppet::master::group],
+    groups  => [$puppet::params::group],
     require => [Class['::apache::install'],
-                Group[$puppet::master::group]],
+                Group[$puppet::params::group]],
   }
 
   # Ensure that the ssl and header modules are enabled.
-  apache::module { 'headers':
-    ensure  => present,
-  }
-
-  apache::module { 'ssl':
-    ensure  => present,
+  apache::module { ['headers', 'ssl']:
+    ensure => present,
   }
 
   # Ensure default sites are disabled.
-  apache::site { 'default':
-    ensure  => absent,
-  }
-
-  apache::site { 'default-ssl':
-    ensure  => absent,
+  apache::site { ['default', 'default-ssl']:
+    ensure => absent,
   }
 
   # Create Puppet Master site configuration and enable it.
@@ -66,7 +53,7 @@ class puppet::master::apache(
 
   # OS-dependent settings.
   case $::osfamily {
-    debian: {
+    'Debian': {
       # Only listen on port 8140.
       file { "${::apache::params::server_root}/ports.conf":
         ensure  => file,
