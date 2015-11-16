@@ -16,7 +16,7 @@
 #  data source.
 #
 # [*merge_behavior*]
-#  Merge behavior to use. 'native' by default.
+#  Merge behavior to use, 'native' by default.
 #
 # [*logger*]
 #  The logger for hiera to use, undefined by default.
@@ -48,6 +48,7 @@ define puppet::hiera_config(
   validate_absolute_path($title)
   validate_array($backends, $hierarchy)
   validate_hash($settings)
+  validate_re($merge_behavior, '^(deep|deeper|native)$')
 
   file { $title:
     ensure  => file,
