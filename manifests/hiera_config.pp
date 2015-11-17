@@ -15,6 +15,9 @@
 #  Array of strings, where each string is the name of a static or dynamic
 #  data source.
 #
+# [*merge_behavior*]
+#  Merge behavior to use, 'native' by default.
+#
 # [*logger*]
 #  The logger for hiera to use, undefined by default.
 #
@@ -31,19 +34,21 @@
 #  Advanced usage only, defaults to 'puppet/hiera.yaml.erb'.
 #
 define puppet::hiera_config(
-  $backends  = ['yaml'],
-  $settings  = {},
-  $hierarchy = [],
-  $logger    = undef,
-  $owner     = undef,
-  $group     = undef,
-  $mode      = '0600',
-  $source    = undef,
-  $template  = 'puppet/hiera.yaml.erb',
+  $backends       = ['yaml'],
+  $settings       = {},
+  $hierarchy      = [],
+  $merge_behavior = 'native',
+  $logger         = undef,
+  $owner          = undef,
+  $group          = undef,
+  $mode           = '0600',
+  $source         = undef,
+  $template       = 'puppet/hiera.yaml.erb',
 ){
   validate_absolute_path($title)
   validate_array($backends, $hierarchy)
   validate_hash($settings)
+  validate_re($merge_behavior, '^(deeper|native)$')
 
   file { $title:
     ensure  => file,
