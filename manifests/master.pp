@@ -211,7 +211,7 @@ class puppet::master(
     owner          => $user,
     group          => $group,
     notify         => Service['apache'],
-    require        => [File[$hiera_datadir] Package['deep_merge']],
+    require        => [File[$hiera_datadir], Package['deep_merge']],
   }
 
   # Puppet configuration (puppet.conf).
