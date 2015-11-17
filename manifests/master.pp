@@ -120,6 +120,12 @@ class puppet::master(
   # Puppet itself is required first.
   include puppet
 
+  # Ensure the 'deep_merge' gem is available for Hiera
+  package { 'deep_merge':
+    ensure   => 'installed',
+    provider => 'gem',
+  }
+
   # Alias $home to $vardir.
   $home = $vardir
 
@@ -205,7 +211,7 @@ class puppet::master(
     owner          => $user,
     group          => $group,
     notify         => Service['apache'],
-    require        => File[$hiera_datadir],
+    require        => [File[$hiera_datadir] Package['deep_merge']],
   }
 
   # Puppet configuration (puppet.conf).
