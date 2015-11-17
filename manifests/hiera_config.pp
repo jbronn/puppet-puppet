@@ -48,7 +48,7 @@ define puppet::hiera_config(
   validate_absolute_path($title)
   validate_array($backends, $hierarchy)
   validate_hash($settings)
-  validate_re($merge_behavior, '^(deep|deeper|native)$')
+  validate_re($merge_behavior, '^(deeper|native)$')
 
   file { $title:
     ensure  => file,
