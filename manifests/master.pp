@@ -44,6 +44,9 @@
 # [*hiera_hierarchy*]
 #  The hierarchy used by Hiera, defaults to ["'%{::fqdn}'", 'common'].
 #
+# [*merge_behavior*]
+#  The merge behavior to use for Hiera.
+#
 # [*manifestdir*]
 #  Path for manifests.  Defaults to '/etc/puppet/manifests'.
 #
@@ -97,6 +100,7 @@ class puppet::master(
   $hiera_backends     = $puppet::params::hiera_backends,
   $hiera_settings     = $puppet::params::hiera_settings,
   $hiera_hierarchy    = $puppet::params::hiera_hierarchy,
+  $merge_behavior     = $puppet::params::merge_behavior,
   $manifestdir        = $puppet::params::manifestdir,
   $manifestdir_mode   = '0640',
   $modulepath         = $puppet::params::modulepath,
@@ -115,6 +119,12 @@ class puppet::master(
 
   # Puppet itself is required first.
   include puppet
+
+  # Ensure the 'deep_merge' gem is available for Hiera
+  package { 'deep_merge':
+    ensure   => 'installed',
+    provider => 'gem',
+  }
 
   # Alias $home to $vardir.
   $home = $vardir
@@ -194,13 +204,14 @@ class puppet::master(
 
   # Hiera configuration.
   puppet::hiera_config { $hiera_config:
-    backends  => $hiera_backends,
-    settings  => $hiera_settings,
-    hierarchy => $hiera_hierarchy,
-    owner     => $user,
-    group     => $group,
-    notify    => Service['apache'],
-    require   => File[$hiera_datadir],
+    backends       => $hiera_backends,
+    settings       => $hiera_settings,
+    hierarchy      => $hiera_hierarchy,
+    merge_behavior => $merge_behavior,
+    owner          => $user,
+    group          => $group,
+    notify         => Service['apache'],
+    require        => [File[$hiera_datadir] Package['deep_merge']],
   }
 
   # Puppet configuration (puppet.conf).
