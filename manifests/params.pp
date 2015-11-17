@@ -41,6 +41,7 @@ class puppet::params {
     }
   }
   $hiera_hierarchy = ["'%{::clientcert}'", 'common']
+  $merge_behavior = 'deeper'
 
   # Master configuration variables.
   $ssl_ciphers = [
