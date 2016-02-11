@@ -35,6 +35,9 @@
 # [*logdir*]
 #  Where the master should store its logs.  Defaults to '/var/log/puppet'.
 #
+# [*merge_behavior*]
+#  The merge behavior to use for Hiera.
+#
 # [*ssldir*]
 #  Where Puppet stores it's SSL certificates.  Defaults to '/etc/puppet/ssl'.
 #
@@ -58,6 +61,7 @@ class puppet::master(
   $hiera_settings       = $puppet::params::hiera_settings,
   $hiera_hierarchy      = $puppet::params::hiera_hierarchy,
   $logdir               = $puppet::params::logdir,
+  $merge_behavior     = $puppet::params::merge_behavior,
   $module_repository    = $puppet::params::module_repository,
   $ssl_ciphers          = $puppet::params::ssl_ciphers,
   $ssl_protocols        = $puppet::params::ssl_protocols,
@@ -68,6 +72,12 @@ class puppet::master(
   # Puppet itself is required first.
   include puppet
   Class['puppet'] -> Class['puppet::user']
+
+  # Ensure the 'deep_merge' gem is available for Hiera
+  package { 'deep_merge':
+    ensure   => 'installed',
+    provider => 'gem',
+  }
 
   # Need puppet user/group.
   include puppet::user
@@ -125,13 +135,14 @@ class puppet::master(
 
   # Hiera configuration.
   puppet::hiera_config { $puppet::params::hiera_config:
-    backends  => $hiera_backends,
-    settings  => $hiera_settings,
-    hierarchy => $hiera_hierarchy,
-    owner     => $puppet::params::user,
-    group     => $puppet::params::group,
-    notify    => Service[$::apache::params::service],
-    require   => File[$environmentpath],
+    backends       => $hiera_backends,
+    settings       => $hiera_settings,
+    hierarchy      => $hiera_hierarchy,
+    merge_behavior => $merge_behavior,
+    owner          => $user,
+    group          => $group,
+    notify         => Service[$::apache::params::service],
+    require        => [File[$environmentpath], Package['deep_merge']],
   }
 
   puppet_setting { 'main/basemodulepath':
