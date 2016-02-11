@@ -68,6 +68,12 @@ class puppet::params {
       $package = 'puppet'
 
       case $::kernelmajversion {
+        '5.9': {
+          $version = '3.8.5'
+        }
+        '5.8': {
+          $version = '3.8.1p5'
+        }
         '5.7': {
           $version = '3.7.4p0'
         }
