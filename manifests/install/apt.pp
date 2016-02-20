@@ -41,7 +41,7 @@ class puppet::install::apt(
   ensure_packages([$facter_package], { 'ensure' => $facter_version })
   ensure_packages([$hiera_package], { 'ensure' => $hiera_version })
   ensure_packages(
-    [$common_package, $puppet_package],
+    [$common_package, $puppet::package],
     { 'ensure' => $puppet_version }
   )
 }
