@@ -175,17 +175,14 @@ class puppet::master(
 
   ## Master settings
 
-  puppet_setting { 'master/group':
-    value => $puppet::params::group,
+  $master_settings = {
+    'master/user'                     => { 'value' => $puppet::params::user },
+    'master/group'                    => { 'value' => $puppet::params::group },
+    'master/ssl_client_header'        => { 'value' => 'SSL_CLIENT_S_DN' },
+    'master/ssl_client_verify_header' => { 'value' => 'SSL_CLIENT_VERIFY' },
+    'master/trusted_node_data'        => { 'value' => true },
   }
-
-  puppet_setting { 'master/trusted_node_data':
-    value => true,
-  }
-
-  puppet_setting { 'master/user':
-    value => $puppet::params::user,
-  }
+  create_resources('puppet_setting', $master_settings)
 
   # Have puppet.conf refresh apache.
   File[$puppet::params::config_file] ~> Service[$::apache::params::service]
