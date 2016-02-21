@@ -157,6 +157,10 @@ class puppet::master(
     value => $puppet::params::confdir,
   }
 
+  puppet_setting { 'main/environmentpath':
+    value => $environmentpath,
+  }
+
   puppet_setting { 'main/codedir':
     value => $puppet::params::codedir,
   }
