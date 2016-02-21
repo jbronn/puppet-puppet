@@ -15,9 +15,9 @@ class puppet::params {
   $puppetlabs = '/etc/puppetlabs'
 
   # General Puppet configuration settings.
-  $basemodulepath = "${codedir}/modules"
   $codedir = "${puppetlabs}/code"
   $confdir = "${puppetlabs}/puppet"
+  $basemodulepath = "${codedir}/modules"
   $config_file = "${confdir}/puppet.conf"
   $environmentpath = "${codedir}/environments"
   $fileserverconfig = "${confdir}/fileserver.conf"

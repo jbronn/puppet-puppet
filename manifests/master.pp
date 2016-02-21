@@ -51,7 +51,7 @@
 #  One of Puppet's main working directories.  Defaults to '/var/lib/puppet'.
 #
 class puppet::master(
-  $basemodulepath       = $puppet::params::modulepath,
+  $basemodulepath       = $puppet::params::basemodulepath,
   $basemodulepath_mode  = '0640',
   $certname             = $::fqdn,
   $codedir_mode         = '0640',
@@ -61,7 +61,7 @@ class puppet::master(
   $hiera_settings       = $puppet::params::hiera_settings,
   $hiera_hierarchy      = $puppet::params::hiera_hierarchy,
   $logdir               = $puppet::params::logdir,
-  $merge_behavior     = $puppet::params::merge_behavior,
+  $merge_behavior       = $puppet::params::merge_behavior,
   $module_repository    = $puppet::params::module_repository,
   $ssl_ciphers          = $puppet::params::ssl_ciphers,
   $ssl_protocols        = $puppet::params::ssl_protocols,
