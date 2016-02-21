@@ -15,14 +15,14 @@ class puppet::master::apache(
 
   # Configure Phusion Passenger as recommended by Pro Puppet.
   class { '::apache::passenger':
-    install_type   => 'apt',
+    install_type   => $puppet::install_type,
     max_requests   => $max_requests,
     max_pool_size  => $max_pool_size,
     pool_idle_time => $pool_idle_time,
   }
 
   # Notify Apache on any changes in Puppet install itself.
-  Class['puppet::install'] ~> Service[$::apache::params::service]
+  Class["puppet::install::${puppet::install_type}"] ~> Service[$::apache::params::service]
 
   include puppet::master::rack
 
