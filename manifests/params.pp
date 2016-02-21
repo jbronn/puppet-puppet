@@ -24,7 +24,6 @@ class puppet::params {
   $logdir = '/var/log/puppet'
   $module_repository = 'https://forgeapi.puppetlabs.com'
   $ssldir = "${confdir}/ssl"
-  $vardir = '/var/lib/puppet'
 
   # r10k settings
   $r10k_confdir = "${puppetlabs}/r10k"
@@ -57,6 +56,7 @@ class puppet::params {
       $user = 'puppet'
       $group = 'puppet'
       $package = 'puppet'
+      $vardir = '/var/lib/puppet'
       $version = 'installed'
     }
     'OpenBSD': {
@@ -66,6 +66,7 @@ class puppet::params {
       $user = '_puppet'
       $group = '_puppet'
       $package = 'puppet'
+      $vardir = '/var/puppet'
 
       case $::kernelmajversion {
         '5.9': {
