@@ -35,7 +35,7 @@ class puppet::master::apache(
   }
 
   # Ensure that the ssl and header modules are enabled.
-  apache::module { ['headers', 'ssl']:
+  apache::module { ['headers', 'proxy', 'ssl']:
     ensure => present,
   }
 

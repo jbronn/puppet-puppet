@@ -30,6 +30,17 @@ Listen 8140
     Allow from all
   </Directory>
 
+<% if scope['puppet::master::external_ca'] -%>
+  SSLProxyEngine On
+  # Proxy all requests that start with things like /production/certificate to the CA
+  ProxyPassMatch ^/([^/]+/certificate.*)$ <%= scope['puppet::master::external_ca'] %>/$1
+  ProxyPassReverse ^(/.*?)/(certificate.*?)/(.*)$ <%= scope['puppet::master::external_ca'] %>/$1
+
+  <Location ~ "/[^/]+/certificate">
+    PassengerHighPerformance Off
+  </Location>
+
+<% end -%>
   LogLevel warn
   ErrorLog <%= scope['apache::params::logs'] %>/master_error.log
   CustomLog <%= scope['apache::params::logs'] %>/master_access.log combined
