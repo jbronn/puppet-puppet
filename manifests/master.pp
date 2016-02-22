@@ -187,6 +187,7 @@ class puppet::master(
 
   # Have puppet.conf refresh apache.
   File[$puppet::params::config_file] ~> Service[$::apache::params::service]
+  Puppet_setting <| |> ~> Service[$::apache::params::service]
 
   if ! $external_ca {
     # Generate CA and certificates for the Puppet Master if they don't exist.
@@ -197,8 +198,9 @@ class puppet::master(
       path      => ['/usr/sbin', '/usr/bin', '/sbin', '/bin', '/usr/local/bin'],
       creates   => "${ssldir}/ca",
       user      => 'root',
-      subscribe => [File[$puppet::params::config_file],
-                    Puppet_setting<| |>],
+      subscribe => File[$puppet::params::config_file],
     }
+
+    Puppet_setting <| |> -> Exec['puppet-generate-certs']
   }
 }
