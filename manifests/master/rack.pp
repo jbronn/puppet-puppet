@@ -4,15 +4,23 @@
 # and Phusion Passenger.
 #
 class puppet::master::rack {
-  $conf = "${puppet::master::confdir}/rack"
-  file { $conf:
+  $usr_share_puppet = '/usr/share/puppet'
+  file { $usr_share_puppet:
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0644',
+  }
+
+  $rack = "${usr_share_puppet}/rack"
+  file { $rack:
     ensure => directory,
     owner  => 'root',
     group  => $puppet::master::group,
     mode   => '0640',
   }
 
-  $puppetmaster = "${conf}/puppetmaster"
+  $puppetmaster = "${rack}/puppetmaster"
   file { $puppetmaster:
     ensure => directory,
     owner  => 'root',
