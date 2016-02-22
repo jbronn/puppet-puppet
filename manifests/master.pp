@@ -57,6 +57,7 @@ class puppet::master(
   $codedir_mode         = '0640',
   $environmentpath      = $puppet::params::environmentpath,
   $environmentpath_mode = '0640',
+  $external_ca          = false,
   $hiera_backends       = $puppet::params::hiera_backends,
   $hiera_settings       = $puppet::params::hiera_settings,
   $hiera_hierarchy      = $puppet::params::hiera_hierarchy,
@@ -187,14 +188,17 @@ class puppet::master(
   # Have puppet.conf refresh apache.
   File[$puppet::params::config_file] ~> Service[$::apache::params::service]
 
-  # Generate CA and certificates for the Puppet Master if they don't exist.
-  # This should not be necessary where Puppet Master / Passenger are
-  # installed via apt.
-  exec { 'puppet-generate-certs':
-    command   => "puppet cert generate ${certname}",
-    path      => ['/usr/sbin', '/usr/bin', '/sbin', '/bin', '/usr/local/bin'],
-    creates   => "${ssldir}/ca",
-    user      => 'root',
-    subscribe => File[$puppet::params::config_file],
+  if ! $external_ca {
+    # Generate CA and certificates for the Puppet Master if they don't exist.
+    # This should not be necessary where Puppet Master / Passenger are
+    # installed via apt.
+    exec { 'puppet-generate-certs':
+      command   => "puppet cert generate ${certname}",
+      path      => ['/usr/sbin', '/usr/bin', '/sbin', '/bin', '/usr/local/bin'],
+      creates   => "${ssldir}/ca",
+      user      => 'root',
+      subscribe => [File[$puppet::params::config_file],
+                    Puppet_setting<| |>],
+    }
   }
 }
