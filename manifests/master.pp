@@ -69,6 +69,13 @@ class puppet::master(
   $ssldir               = $puppet::params::ssldir,
   $vardir               = $puppet::params::vardir,
 ) inherits puppet::params {
+  validate_absolute_path(
+    $basemodulepath, $environmentpath, $logdir, $ssldir, $vardir
+  )
+  validate_array(
+    $hiera_backends, $hiera_hierarchy, $ssl_ciphers, $ssl_protocols
+  )
+  validate_hash($hiera_settings)
 
   # Puppet itself is required first.
   include puppet
